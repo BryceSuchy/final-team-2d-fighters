@@ -25,9 +25,23 @@ namespace Completed
 			}
 		}
 		
-		
-		public int columns = 8; 										//Number of columns in our game board.
-		public int rows = 8;											//Number of rows in our game board.
+		//0 is floor, 1 is wall, 2 is food, 3 is enemy
+		//this array is transposed for some reason
+		public int[,] layout = new int[11, 10] {
+			{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+			{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+			{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+			{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+			{ 1, 0, 0, 3, 1, 1, 0, 0, 0, 1 },
+			{ 1, 0, 0, 2, 1, 1, 0, 0, 0, 1 },
+			{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+			{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+			{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+			{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+			{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
+		};
+		public int columns;												//Number of columns in our game board.
+		public int rows;												//Number of rows in our game board.
 		public Count wallCount = new Count (5, 9);						//Lower and upper limit for our random number of walls per level.
 		public Count foodCount = new Count (1, 5);						//Lower and upper limit for our random number of food items per level.
 		public GameObject exit;											//Prefab to spawn for exit.
@@ -66,7 +80,7 @@ namespace Completed
 			//Instantiate Board and set boardHolder to its transform.
 			boardHolder = new GameObject ("Board").transform;
 			
-			//Loop along x axis, starting from -1 (to fill corner) with floor or outerwall edge tiles.
+			/*//Loop along x axis, starting from -1 (to fill corner) with floor or outerwall edge tiles.
 			for(int x = -1; x < columns + 1; x++)
 			{
 				//Loop along y axis, starting from -1 to place floor or outerwall tiles.
@@ -85,6 +99,47 @@ namespace Completed
 					
 					//Set the parent of our newly instantiated object instance to boardHolder, this is just organizational to avoid cluttering hierarchy.
 					instance.transform.SetParent (boardHolder);
+				}
+			}*/
+
+			//loop through the rows
+			for (int i = 0; i < layout.GetLength (0); i++) {
+				//loop through each column in the row
+				for (int j = 0; j < layout.GetLength (1); j++) {
+					GameObject toInstantiate;
+					int type = layout [i, j];
+					if (type == 1) {
+						toInstantiate = outerWallTiles [Random.Range (0, outerWallTiles.Length)];
+					} else {
+						toInstantiate = floorTiles [Random.Range (0, floorTiles.Length)];
+					}
+
+					//translate array indices into vector coords
+					int x = i - 1;
+					int y = j - 1;
+					Vector3 position = new Vector3 (x, y, 0f);
+
+					//Instantiate the GameObject instance using the prefab chosen for toInstantiate at the Vector3 corresponding to current grid position in loop, cast it to GameObject.
+					GameObject instance =
+						Instantiate (toInstantiate, position, Quaternion.identity) as GameObject;
+
+					//Set the parent of our newly instantiated object instance to boardHolder, this is just organizational to avoid cluttering hierarchy.
+					instance.transform.SetParent (boardHolder);
+
+					//add food or enemy if necessary
+					if (type == 2) {
+						//Choose a random tile from tileArray and assign it to tileChoice
+						GameObject foodChoice = foodTiles [Random.Range (0, foodTiles.Length)];
+
+						//Instantiate tileChoice at the position returned by RandomPosition with no change in rotation
+						Instantiate (foodChoice, position, Quaternion.identity);
+					} else if (type == 3) {
+						//Choose a random tile from tileArray and assign it to tileChoice
+						GameObject enemyChoice = enemyTiles [Random.Range (0, enemyTiles.Length)];
+
+						//Instantiate tileChoice at the position returned by RandomPosition with no change in rotation
+						Instantiate (enemyChoice, position, Quaternion.identity);
+					}
 				}
 			}
 		}
@@ -131,6 +186,8 @@ namespace Completed
 		//SetupScene initializes our level and calls the previous functions to lay out the game board
 		public void SetupScene (int level)
 		{
+			columns = layout.GetLength (0) - 2;
+			rows = layout.GetLength (1) - 2;
 			//Creates the outer walls and floor.
 			BoardSetup ();
 			
@@ -138,16 +195,16 @@ namespace Completed
 			InitialiseList ();
 			
 			//Instantiate a random number of wall tiles based on minimum and maximum, at randomized positions.
-			LayoutObjectAtRandom (wallTiles, wallCount.minimum, wallCount.maximum);
+			//LayoutObjectAtRandom (wallTiles, wallCount.minimum, wallCount.maximum);
 			
 			//Instantiate a random number of food tiles based on minimum and maximum, at randomized positions.
-			LayoutObjectAtRandom (foodTiles, foodCount.minimum, foodCount.maximum);
+			//LayoutObjectAtRandom (foodTiles, foodCount.minimum, foodCount.maximum);
 			
 			//Determine number of enemies based on current level number, based on a logarithmic progression
-			int enemyCount = (int)Mathf.Log(level, 2f);
+			//int enemyCount = (int)Mathf.Log(level, 2f);
 			
 			//Instantiate a random number of enemies based on minimum and maximum, at randomized positions.
-			LayoutObjectAtRandom (enemyTiles, enemyCount, enemyCount);
+			//LayoutObjectAtRandom (enemyTiles, enemyCount, enemyCount);
 			
 			//Instantiate the exit tile in the upper right hand corner of our game board
 			Instantiate (exit, new Vector3 (columns - 1, rows - 1, 0f), Quaternion.identity);

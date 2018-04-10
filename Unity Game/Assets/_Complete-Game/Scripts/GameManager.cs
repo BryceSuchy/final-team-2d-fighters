@@ -1,213 +1,181 @@
 ﻿using UnityEngine;
-using System;
-using System.Collections.Generic; 		//Allows us to use Lists.
-using Random = UnityEngine.Random; 		//Tells Random to use the Unity Engine random number generator.
+using UnityEngine.SceneManagement;
+using System.Collections;
 
 namespace Completed
-	
 {
+	using System.Collections.Generic;		//Allows us to use Lists. 
+	using UnityEngine.UI;					//Allows us to use UI.
 	
-	public class BoardManager : MonoBehaviour
+	public class GameManager : MonoBehaviour
 	{
-		// Using Serializable allows us to embed a class with sub properties in the inspector.
-		[Serializable]
-		public class Count
+		public float levelStartDelay = 2f;						//Time to wait before starting level, in seconds.
+		public float turnDelay = 0.1f;							//Delay between each Player turn.
+		public int playerFoodPoints = 100;						//Starting value for Player food points.
+		public static GameManager instance = null;				//Static instance of GameManager which allows it to be accessed by any other script.
+		[HideInInspector] public bool playersTurn = true;		//Boolean to check if it's players turn, hidden in inspector but public.
+		
+		
+		private Text levelText;									//Text to display current level number.
+		private GameObject levelImage;							//Image to block out level as levels are being set up, background for levelText.
+		private BoardManager boardScript;						//Store a reference to our BoardManager which will set up the level.
+		private int level = 1;									//Current level number, expressed in game as "Day 1".
+		private List<Enemy> enemies;							//List of all Enemy units, used to issue them move commands.
+		private bool enemiesMoving;								//Boolean to check if enemies are moving.
+		private bool doingSetup = true;							//Boolean to check if we're setting up board, prevent Player from moving during setup.
+		
+		
+		
+		//Awake is always called before any Start functions
+		void Awake()
 		{
-			public int minimum; 			//Minimum value for our Count class.
-			public int maximum; 			//Maximum value for our Count class.
+            //Check if instance already exists
+            if (instance == null)
+
+                //if not, set instance to this
+                instance = this;
+
+            //If instance already exists and it's not this:
+            else if (instance != this)
+
+                //Then destroy this. This enforces our singleton pattern, meaning there can only ever be one instance of a GameManager.
+                Destroy(gameObject);	
 			
+			//Sets this to not be destroyed when reloading scene
+			DontDestroyOnLoad(gameObject);
 			
-			//Assignment constructor.
-			public Count (int min, int max)
-			{
-				minimum = min;
-				maximum = max;
-			}
+			//Assign enemies to a new List of Enemy objects.
+			enemies = new List<Enemy>();
+			
+			//Get a component reference to the attached BoardManager script
+			boardScript = GetComponent<BoardManager>();
+			
+			//Call the InitGame function to initialize the first level 
+			InitGame();
 		}
+
+        //this is called only once, and the paramter tell it to be called only after the scene was loaded
+        //(otherwise, our Scene Load callback would be called the very first load, and we don't want that)
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static public void CallbackInitialization()
+        {
+            //register the callback to be called everytime the scene is loaded
+            SceneManager.sceneLoaded += OnSceneLoaded;
+        }
+
+        //This is called each time a scene is loaded.
+        static private void OnSceneLoaded(Scene arg0, LoadSceneMode arg1)
+        {
+            instance.level++;
+            instance.InitGame();
+        }
+
 		
-		//0 is floor, 1 is wall, 2 is food, 3 is enemy
-		//this array is transposed for some reason
-		public int[,] layout = new int[11, 10] {
-			{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-			{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-			{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-			{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-			{ 1, 0, 0, 3, 1, 1, 0, 0, 0, 1 },
-			{ 1, 0, 0, 2, 1, 1, 0, 0, 0, 1 },
-			{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-			{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-			{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-			{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-			{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
-		};
-		public int columns;												//Number of columns in our game board.
-		public int rows;												//Number of rows in our game board.
-		public Count wallCount = new Count (5, 9);						//Lower and upper limit for our random number of walls per level.
-		public Count foodCount = new Count (1, 5);						//Lower and upper limit for our random number of food items per level.
-		public GameObject exit;											//Prefab to spawn for exit.
-		public GameObject[] floorTiles;									//Array of floor prefabs.
-		public GameObject[] wallTiles;									//Array of wall prefabs.
-		public GameObject[] foodTiles;									//Array of food prefabs.
-		public GameObject[] enemyTiles;									//Array of enemy prefabs.
-		public GameObject[] outerWallTiles;								//Array of outer tile prefabs.
-		
-		private Transform boardHolder;									//A variable to store a reference to the transform of our Board object.
-		private List <Vector3> gridPositions = new List <Vector3> ();	//A list of possible locations to place tiles.
-		
-		
-		//Clears our list gridPositions and prepares it to generate a new board.
-		void InitialiseList ()
+		//Initializes the game for each level.
+		void InitGame()
 		{
-			//Clear our list gridPositions.
-			gridPositions.Clear ();
+			//While doingSetup is true the player can't move, prevent player from moving while title card is up.
+			doingSetup = true;
 			
-			//Loop through x axis (columns).
-			for(int x = 1; x < columns-1; x++)
-			{
-				//Within each column, loop through y axis (rows).
-				for(int y = 1; y < rows-1; y++)
-				{
-					//At each index add a new Vector3 to our list with the x and y coordinates of that position.
-					gridPositions.Add (new Vector3(x, y, 0f));
-				}
-			}
-		}
-		
-		
-		//Sets up the outer walls and floor (background) of the game board.
-		void BoardSetup ()
-		{
-			//Instantiate Board and set boardHolder to its transform.
-			boardHolder = new GameObject ("Board").transform;
+			//Get a reference to our image LevelImage by finding it by name.
+			levelImage = GameObject.Find("LevelImage");
 			
-			/*//Loop along x axis, starting from -1 (to fill corner) with floor or outerwall edge tiles.
-			for(int x = -1; x < columns + 1; x++)
-			{
-				//Loop along y axis, starting from -1 to place floor or outerwall tiles.
-				for(int y = -1; y < rows + 1; y++)
-				{
-					//Choose a random tile from our array of floor tile prefabs and prepare to instantiate it.
-					GameObject toInstantiate = floorTiles[Random.Range (0,floorTiles.Length)];
-					
-					//Check if we current position is at board edge, if so choose a random outer wall prefab from our array of outer wall tiles.
-					if(x == -1 || x == columns || y == -1 || y == rows)
-						toInstantiate = outerWallTiles [Random.Range (0, outerWallTiles.Length)];
-					
-					//Instantiate the GameObject instance using the prefab chosen for toInstantiate at the Vector3 corresponding to current grid position in loop, cast it to GameObject.
-					GameObject instance =
-						Instantiate (toInstantiate, new Vector3 (x, y, 0f), Quaternion.identity) as GameObject;
-					
-					//Set the parent of our newly instantiated object instance to boardHolder, this is just organizational to avoid cluttering hierarchy.
-					instance.transform.SetParent (boardHolder);
-				}
-			}*/
-
-			//loop through the rows
-			for (int i = 0; i < layout.GetLength (0); i++) {
-				//loop through each column in the row
-				for (int j = 0; j < layout.GetLength (1); j++) {
-					GameObject toInstantiate;
-					int type = layout [i, j];
-					if (type == 1) {
-						toInstantiate = outerWallTiles [Random.Range (0, outerWallTiles.Length)];
-					} else {
-						toInstantiate = floorTiles [Random.Range (0, floorTiles.Length)];
-					}
-
-					//translate array indices into vector coords
-					int x = i - 1;
-					int y = j - 1;
-					Vector3 position = new Vector3 (x, y, 0f);
-
-					//Instantiate the GameObject instance using the prefab chosen for toInstantiate at the Vector3 corresponding to current grid position in loop, cast it to GameObject.
-					GameObject instance =
-						Instantiate (toInstantiate, position, Quaternion.identity) as GameObject;
-
-					//Set the parent of our newly instantiated object instance to boardHolder, this is just organizational to avoid cluttering hierarchy.
-					instance.transform.SetParent (boardHolder);
-
-					//add food or enemy if necessary
-					if (type == 2) {
-						//Choose a random tile from tileArray and assign it to tileChoice
-						GameObject foodChoice = foodTiles [Random.Range (0, foodTiles.Length)];
-
-						//Instantiate tileChoice at the position returned by RandomPosition with no change in rotation
-						Instantiate (foodChoice, position, Quaternion.identity);
-					} else if (type == 3) {
-						//Choose a random tile from tileArray and assign it to tileChoice
-						GameObject enemyChoice = enemyTiles [Random.Range (0, enemyTiles.Length)];
-
-						//Instantiate tileChoice at the position returned by RandomPosition with no change in rotation
-						Instantiate (enemyChoice, position, Quaternion.identity);
-					}
-				}
-			}
+			//Get a reference to our text LevelText's text component by finding it by name and calling GetComponent.
+			levelText = GameObject.Find("LevelText").GetComponent<Text>();
+			
+			//Set the text of levelText to the string "Day" and append the current level number.
+			levelText.text = "Day " + level;
+			
+			//Set levelImage to active blocking player's view of the game board during setup.
+			levelImage.SetActive(true);
+			
+			//Call the HideLevelImage function with a delay in seconds of levelStartDelay.
+			Invoke("HideLevelImage", levelStartDelay);
+			
+			//Clear any Enemy objects in our List to prepare for next level.
+			enemies.Clear();
+			
+			//Call the SetupScene function of the BoardManager script, pass it current level number.
+			boardScript.SetupScene(level);
+			
 		}
 		
 		
-		//RandomPosition returns a random position from our list gridPositions.
-		Vector3 RandomPosition ()
+		//Hides black image used between levels
+		void HideLevelImage()
 		{
-			//Declare an integer randomIndex, set it's value to a random number between 0 and the count of items in our List gridPositions.
-			int randomIndex = Random.Range (0, gridPositions.Count);
+			//Disable the levelImage gameObject.
+			levelImage.SetActive(false);
 			
-			//Declare a variable of type Vector3 called randomPosition, set it's value to the entry at randomIndex from our List gridPositions.
-			Vector3 randomPosition = gridPositions[randomIndex];
-			
-			//Remove the entry at randomIndex from the list so that it can't be re-used.
-			gridPositions.RemoveAt (randomIndex);
-			
-			//Return the randomly selected Vector3 position.
-			return randomPosition;
+			//Set doingSetup to false allowing player to move again.
+			doingSetup = false;
 		}
 		
-		
-		//LayoutObjectAtRandom accepts an array of game objects to choose from along with a minimum and maximum range for the number of objects to create.
-		void LayoutObjectAtRandom (GameObject[] tileArray, int minimum, int maximum)
+		//Update is called every frame.
+		void Update()
 		{
-			//Choose a random number of objects to instantiate within the minimum and maximum limits
-			int objectCount = Random.Range (minimum, maximum+1);
-			
-			//Instantiate objects until the randomly chosen limit objectCount is reached
-			for(int i = 0; i < objectCount; i++)
-			{
-				//Choose a position for randomPosition by getting a random position from our list of available Vector3s stored in gridPosition
-				Vector3 randomPosition = RandomPosition();
+			//Check that playersTurn or enemiesMoving or doingSetup are not currently true.
+			if(playersTurn || enemiesMoving || doingSetup)
 				
-				//Choose a random tile from tileArray and assign it to tileChoice
-				GameObject tileChoice = tileArray[Random.Range (0, tileArray.Length)];
-				
-				//Instantiate tileChoice at the position returned by RandomPosition with no change in rotation
-				Instantiate(tileChoice, randomPosition, Quaternion.identity);
-			}
+				//If any of these are true, return and do not start MoveEnemies.
+				return;
+			
+			//Start moving enemies.
+			StartCoroutine (MoveEnemies ());
+		}
+		
+		//Call this to add the passed in Enemy to the List of Enemy objects.
+		public void AddEnemyToList(Enemy script)
+		{
+			//Add Enemy to List enemies.
+			enemies.Add(script);
 		}
 		
 		
-		//SetupScene initializes our level and calls the previous functions to lay out the game board
-		public void SetupScene (int level)
+		//GameOver is called when the player reaches 0 food points
+		public void GameOver()
 		{
-			columns = layout.GetLength (0) - 2;
-			rows = layout.GetLength (1) - 2;
-			//Creates the outer walls and floor.
-			BoardSetup ();
+			//Set levelText to display number of levels passed and game over message
+			levelText.text = "After " + level + " days, you starved.";
 			
-			//Reset our list of gridpositions.
-			InitialiseList ();
+			//Enable black background image gameObject.
+			levelImage.SetActive(true);
 			
-			//Instantiate a random number of wall tiles based on minimum and maximum, at randomized positions.
-			//LayoutObjectAtRandom (wallTiles, wallCount.minimum, wallCount.maximum);
+			//Disable this GameManager.
+			enabled = false;
+		}
+		
+		//Coroutine to move enemies in sequence.
+		IEnumerator MoveEnemies()
+		{
+			//While enemiesMoving is true player is unable to move.
+			enemiesMoving = true;
 			
-			//Instantiate a random number of food tiles based on minimum and maximum, at randomized positions.
-			//LayoutObjectAtRandom (foodTiles, foodCount.minimum, foodCount.maximum);
+			//Wait for turnDelay seconds, defaults to .1 (100 ms).
+			yield return new WaitForSeconds(turnDelay);
 			
-			//Determine number of enemies based on current level number, based on a logarithmic progression
-			//int enemyCount = (int)Mathf.Log(level, 2f);
+			//If there are no enemies spawned (IE in first level):
+			if (enemies.Count == 0) 
+			{
+				//Wait for turnDelay seconds between moves, replaces delay caused by enemies moving when there are none.
+				yield return new WaitForSeconds(turnDelay);
+			}
 			
-			//Instantiate a random number of enemies based on minimum and maximum, at randomized positions.
-			//LayoutObjectAtRandom (enemyTiles, enemyCount, enemyCount);
+			//Loop through List of Enemy objects.
+			for (int i = 0; i < enemies.Count; i++)
+			{
+				//Call the MoveEnemy function of Enemy at index i in the enemies List.
+				enemies[i].MoveEnemy ();
+				
+				//Wait for Enemy's moveTime before moving next Enemy, 
+				yield return new WaitForSeconds(enemies[i].moveTime);
+			}
+			//Once Enemies are done moving, set playersTurn to true so player can move.
+			playersTurn = true;
 			
-			//Instantiate the exit tile in the upper right hand corner of our game board
-			Instantiate (exit, new Vector3 (columns - 1, rows - 1, 0f), Quaternion.identity);
+			//Enemies are done moving, set enemiesMoving to false.
+			enemiesMoving = false;
 		}
 	}
 }
+
