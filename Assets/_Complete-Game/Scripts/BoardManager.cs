@@ -24,8 +24,9 @@ namespace Completed
 				maximum = max;
 			}
 		}
-		
-		//0 is floor, 1 is wall, 2 is food, 3 is enemy
+
+		public int[,] layout;
+		/*//0 is floor, 1 is wall, 2 is food, 3 is enemy
 		//this array is transposed for some reason
 		public int[,] layout = new int[11, 10] {
 			{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
@@ -39,7 +40,9 @@ namespace Completed
 			{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
 			{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
 			{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
-		};
+		};*/
+
+
 		public int columns;												//Number of columns in our game board.
 		public int rows;												//Number of rows in our game board.
 		public Count wallCount = new Count (5, 9);						//Lower and upper limit for our random number of walls per level.
@@ -186,6 +189,25 @@ namespace Completed
 		//SetupScene initializes our level and calls the previous functions to lay out the game board
 		public void SetupScene (int level)
 		{
+			string file = System.IO.Directory.GetCurrentDirectory () + "/Assets/_Complete-game/Levels/" + "Test" + ".csv";
+			Debug.Log(string.Format("Path: {0}", file));
+			string[] lines = System.IO.File.ReadAllLines(file);
+			char[] comma = new char[] { ',' };
+			string[] firstRow = lines [0].Split (comma);
+			//need to rotate right while loading into the array, because the array gets rotated left
+			//find the height and width
+			int height = lines.GetLength(0);
+			int width = firstRow.GetLength(0);
+
+			layout = new int[width, height];
+
+			for (int row = 0; row < height; row++) {
+				string[] tiles = lines [row].Split (comma);
+				for (int col = 0; col < width; col++) {
+					layout [col,height - row - 1] = Convert.ToInt32 (tiles [col]);
+				}
+			}
+
 			columns = layout.GetLength (0) - 2;
 			rows = layout.GetLength (1) - 2;
 			//Creates the outer walls and floor.

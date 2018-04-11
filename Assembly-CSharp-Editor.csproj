@@ -9,7 +9,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{D5FF6986-91BB-40D1-0EB8-8660AB37B5F9}</ProjectGuid>
+    <ProjectGuid>{8D56FA6E-72CF-2F4A-5B1F-245793779121}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Assembly-CSharp-Editor</AssemblyName>
@@ -54,7 +54,7 @@
      <Compile Include="Assets\TutorialInfo\Scripts\Editor\ReadmeEditor.cs" />
      <Compile Include="Assets\TutorialInfo\Scripts\Editor\TutorialInfoEditor.cs" />
  <Reference Include="Facebook.Unity.Settings">
- <HintPath>C:/Users/Callahan/Documents/finalproject/final-team-2d-fighters/Unity Game/Library/FacebookSDK/Facebook.Unity.Settings.dll</HintPath>
+ <HintPath>C:/Users/Quinn/Desktop/School/Game dev/gitisstupid/final-team-2d-fighters/Library/FacebookSDK/Facebook.Unity.Settings.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
@@ -143,7 +143,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Assembly-CSharp.csproj">
-      <Project>{E90DE692-4C1D-1309-F740-9ED02D8AD415}</Project>      <Name>Assembly-CSharp</Name>    </ProjectReference>
+      <Project>{F88B6823-3D9C-F5AA-752E-A415472E9FDD}</Project>      <Name>Assembly-CSharp</Name>    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
