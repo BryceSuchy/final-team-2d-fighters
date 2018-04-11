@@ -1,0 +1,13 @@
+language: objective-c
+osx_image: xcode8
+rvm:
+- 2.3.1
+
+before_install:
+- chmod a+x ./Scripts/install.sh
+- chmod a+x ./Scripts/build.sh
+
+install:
+- ./Scripts/install.sh
+script:
+- ./Scripts/build.sh "final-team-2d-fighters-$TRAVIS_TAG"
