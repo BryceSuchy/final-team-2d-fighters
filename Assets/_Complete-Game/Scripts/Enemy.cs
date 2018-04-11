@@ -57,7 +57,23 @@ namespace Completed
 		//MoveEnemy is called by the GameManger each turn to tell each Enemy to try to move towards the player.
 		public void MoveEnemy ()
 		{
-			//Declare variables for X and Y axis move directions, these range from -1 to 1.
+			float speed = .01f;
+			float xDis = target.position.x - transform.position.x;
+			float yDis = target.position.y - transform.position.y;
+
+			float totalDis = Mathf.Sqrt(Mathf.Pow (xDis, 2) + Mathf.Pow (yDis, 2));
+			float ratio = totalDis / speed;
+
+			float newX = transform.position.x + xDis / ratio;
+			float newY = transform.position.y + yDis / ratio;
+
+			BoxCollider2D boxCollider = GetComponent <BoxCollider2D> ();
+
+			//Get a component reference to this object's Rigidbody2D
+			Rigidbody2D rb2D = GetComponent <Rigidbody2D> ();
+
+			rb2D.MovePosition (new Vector2 (newX, newY));
+			/*//Declare variables for X and Y axis move directions, these range from -1 to 1.
 			//These values allow us to choose between the cardinal directions: up, down, left and right.
 			int xDir = 0;
 			int yDir = 0;
@@ -74,7 +90,7 @@ namespace Completed
 				xDir = target.position.x > transform.position.x ? 1 : -1;
 			
 			//Call the AttemptMove function and pass in the generic parameter Player, because Enemy is moving and expecting to potentially encounter a Player
-			AttemptMove <Player> (xDir, yDir);
+			AttemptMove <Player> (xDir, yDir);*/
 		}
 		
 		

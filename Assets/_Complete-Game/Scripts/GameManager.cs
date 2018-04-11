@@ -114,14 +114,19 @@ namespace Completed
 		//Update is called every frame.
 		void Update()
 		{
-			//Check that playersTurn or enemiesMoving or doingSetup are not currently true.
+			if (!doingSetup) {
+				foreach (Enemy enemy in enemies) {
+					enemy.MoveEnemy ();
+				}
+			}
+			/*//Check that playersTurn or enemiesMoving or doingSetup are not currently true.
 			if(playersTurn || enemiesMoving || doingSetup)
 				
 				//If any of these are true, return and do not start MoveEnemies.
 				return;
 			
 			//Start moving enemies.
-			StartCoroutine (MoveEnemies ());
+			StartCoroutine (MoveEnemies ());*/
 		}
 		
 		//Call this to add the passed in Enemy to the List of Enemy objects.
