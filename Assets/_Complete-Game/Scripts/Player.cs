@@ -58,23 +58,73 @@ namespace Completed
 			//If it's not the player's turn, exit the function.
 			//if(!GameManager.instance.playersTurn) return;
 			
-			int horizontal = 0;  	//Used to store the horizontal move direction.
-			int vertical = 0;		//Used to store the vertical move direction.
+			float horizontal = 0;  	//Used to store the horizontal move direction.
+			float vertical = 0;		//Used to store the vertical move direction.
 			
 			//Check if we are running either in the Unity editor or in a standalone build.
 #if UNITY_STANDALONE || UNITY_WEBPLAYER
 			
 			//Get input from the input manager, round it to an integer and store in horizontal to set x axis move direction
-			horizontal = (int) (Input.GetAxisRaw ("Horizontal"));
+			horizontal = Input.GetAxisRaw ("Horizontal");
 			
 			//Get input from the input manager, round it to an integer and store in vertical to set y axis move direction
-			vertical = (int) (Input.GetAxisRaw ("Vertical"));
+			vertical = Input.GetAxisRaw ("Vertical");
+
+			float speed = .1f;
+
+			float totalDis = Mathf.Sqrt(Mathf.Pow (horizontal, 2) + Mathf.Pow (vertical, 2));
+			float ratio = totalDis / speed;
+
+			float newX = transform.position.x + horizontal / ratio;
+			float newY = transform.position.y + vertical / ratio;
+
+			BoxCollider2D boxCollider = GetComponent <BoxCollider2D> ();
+			Rigidbody2D rb2D = GetComponent <Rigidbody2D> ();
+
+			if(float.IsNaN(newX)){
+				newX = transform.position.x;
+			}
+				
+			if(float.IsNaN(newY)){
+				newY = transform.position.y;
+			}
+
+			//Store start position to move from, based on objects current transform position.
+			Vector2 start = transform.position;
+
+			// Calculate end position based on the direction parameters passed in when calling Move.
+			Vector2 end = new Vector2(newX, newY);
+
+			//Disable the boxCollider so that linecast doesn't hit this object's own collider.
+			boxCollider.enabled = false;
+
+			//Cast a line from start point to end point checking collision on blockingLayer.
+			RaycastHit2D hit = Physics2D.Linecast (start, end, blockingLayer);
+
+			//Re-enable boxCollider after linecast
+			boxCollider.enabled = true;
+
+			//Check if anything was hit
+			if(hit.transform == null)
+			{
+				
+				//If nothing was hit, move player to destination
+				rb2D.MovePosition (new Vector2 (newX, newY));
+
+				//Return true to say that Move was successful
+
+			} else {
+				Debug.Log(hit.GetType());
+			}
+
+
+
 			
 			//Check if moving horizontally, if so set vertical to zero.
-			if(horizontal != 0)
+			/*if(horizontal != 0)
 			{
 				vertical = 0;
-			}
+			}*/
 			//Check if we are running on iOS, Android, Windows Phone 8 or Unity iPhone
 #elif UNITY_IOS || UNITY_ANDROID || UNITY_WP8 || UNITY_IPHONE
 			
@@ -118,20 +168,21 @@ namespace Completed
 			
 #endif //End of mobile platform dependendent compilation section started above with #elif
 			//Check if we have a non-zero value for horizontal or vertical
-			if(horizontal != 0 || vertical != 0)
+			/*if(horizontal != 0 || vertical != 0)
 			{
 				//Call AttemptMove passing in the generic parameter Wall, since that is what Player may interact with if they encounter one (by attacking it)
 				//Pass in horizontal and vertical as parameters to specify the direction to move Player in.
 				AttemptMove<Wall> (horizontal, vertical);
-			}
+			}*/
+
 		}
 		
 		//AttemptMove overrides the AttemptMove function in the base class MovingObject
 		//AttemptMove takes a generic parameter T which for Player will be of the type Wall, it also takes integers for x and y direction to move in.
 		protected override void AttemptMove <T> (int xDir, int yDir)
 		{
+			Debug.Log ("in method AttemptMove of Player");
 			//Every time player moves, subtract from food points total.
-			food--;
 			
 			//Update food text display to reflect current score.
 			foodText.text = "Food: " + food;

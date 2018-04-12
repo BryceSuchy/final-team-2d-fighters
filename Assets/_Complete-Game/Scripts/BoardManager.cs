@@ -190,7 +190,6 @@ namespace Completed
 		public void SetupScene (int level)
 		{
 			string file = System.IO.Directory.GetCurrentDirectory () + "/Assets/_Complete-game/Levels/" + "Test" + ".csv";
-			Debug.Log(string.Format("Path: {0}", file));
 			string[] lines = System.IO.File.ReadAllLines(file);
 			char[] comma = new char[] { ',' };
 			string[] firstRow = lines [0].Split (comma);

@@ -72,7 +72,31 @@ namespace Completed
 			//Get a component reference to this object's Rigidbody2D
 			Rigidbody2D rb2D = GetComponent <Rigidbody2D> ();
 
-			rb2D.MovePosition (new Vector2 (newX, newY));
+			//Store start position to move from, based on objects current transform position.
+			Vector2 start = transform.position;
+
+			// Calculate end position based on the direction parameters passed in when calling Move.
+			Vector2 end = new Vector2(newX, newY);
+
+			//Disable the boxCollider so that linecast doesn't hit this object's own collider.
+			boxCollider.enabled = false;
+
+			//Cast a line from start point to end point checking collision on blockingLayer.
+			RaycastHit2D hit = Physics2D.Linecast (start, end, blockingLayer);
+
+			//Re-enable boxCollider after linecast
+			boxCollider.enabled = true;
+
+			//Check if anything was hit
+			if(hit.transform == null)
+			{
+
+				//If nothing was hit, move enemy to destination
+				rb2D.MovePosition (new Vector2 (newX, newY));
+
+			}
+
+
 			/*//Declare variables for X and Y axis move directions, these range from -1 to 1.
 			//These values allow us to choose between the cardinal directions: up, down, left and right.
 			int xDir = 0;
