@@ -26,7 +26,7 @@ namespace Completed
 		}
 
 		public int[,] layout;
-		/*//0 is floor, 1 is wall, 2 is food, 3 is enemy
+		/*//0 is floor, 1 is wall, 2 is food, 3 is enemy, 4 is the exit/chest
 		//this array is transposed for some reason
 		public int[,] layout = new int[11, 10] {
 			{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
@@ -142,6 +142,8 @@ namespace Completed
 
 						//Instantiate tileChoice at the position returned by RandomPosition with no change in rotation
 						Instantiate (enemyChoice, position, Quaternion.identity);
+					} else if (type == 4) {
+						Instantiate (exit, position, Quaternion.identity);
 					}
 				}
 			}
@@ -190,6 +192,9 @@ namespace Completed
 		public void SetupScene (int level)
 		{
 			string file = System.IO.Directory.GetCurrentDirectory () + "/Assets/_Complete-game/Levels/" + "Test" + ".csv";
+			if (level >= 5) {
+				file = System.IO.Directory.GetCurrentDirectory () + "/Assets/_Complete-game/Levels/" + "Hard" + ".csv";
+			}
 			string[] lines = System.IO.File.ReadAllLines(file);
 			char[] comma = new char[] { ',' };
 			string[] firstRow = lines [0].Split (comma);
@@ -228,7 +233,7 @@ namespace Completed
 			//LayoutObjectAtRandom (enemyTiles, enemyCount, enemyCount);
 			
 			//Instantiate the exit tile in the upper right hand corner of our game board
-			Instantiate (exit, new Vector3 (columns - 1, rows - 1, 0f), Quaternion.identity);
+			//Instantiate (exit, new Vector3 (columns - 1, rows - 1, 0f), Quaternion.identity);
 
 		}
 	}
