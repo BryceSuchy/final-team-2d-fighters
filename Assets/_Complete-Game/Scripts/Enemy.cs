@@ -57,8 +57,7 @@ namespace Completed
 		//MoveEnemy is called by the GameManger each turn to tell each Enemy to try to move towards the player.
 		public void MoveEnemy ()
 		{
-			Debug.Log ("Called moveenemy");
-			float speed = .01f;
+			float speed = .03f;
 			float xDis = target.position.x - transform.position.x;
 			float yDis = target.position.y - transform.position.y;
 
@@ -91,7 +90,6 @@ namespace Completed
 			//Check if anything was hit
 			if(hit.transform == null)
 			{
-				Debug.Log ("nothing in the way");
 				//If nothing was hit, move enemy to destination
 				rb2D.MovePosition (new Vector2 (newX, newY));
 

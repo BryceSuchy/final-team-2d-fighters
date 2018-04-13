@@ -105,7 +105,7 @@ namespace Completed
 			boxCollider.enabled = true;
 
 			//Check if anything was hit
-			if(hit.transform == null)
+			if(hit.transform == null || hit.transform.tag == "Enemy")
 			{
 				
 				//If nothing was hit, move player to destination
@@ -113,8 +113,6 @@ namespace Completed
 
 				//Return true to say that Move was successful
 
-			} else {
-				Debug.Log(hit.GetType());
 			}
 
 
@@ -227,18 +225,16 @@ namespace Completed
 		private void OnTriggerEnter2D(Collider2D other)
 		{
 			//Check if the tag of the trigger collided with is Exit.
-			if (other.tag == "Exit")
-			{
+			if (other.tag == "Exit") {
 				//Invoke the Restart function to start the next level with a delay of restartLevelDelay (default 1 second).
-				Invoke("Restart", restartLevelDelay);
+				Invoke ("Restart", restartLevelDelay);
 
 				//Disable the player object since level is over.
 				enabled = false;
 			}
 
 			//Check if the tag of the trigger collided with is Food.
-			else if (other.tag == "Food")
-			{
+			else if (other.tag == "Food") {
 				//Add pointsPerFood to the players current food total.
 				health += pointsPerFood;
 
@@ -246,15 +242,14 @@ namespace Completed
 				foodText.text = "+" + pointsPerFood + " Health: " + health;
 
 				//Call the RandomizeSfx function of SoundManager and pass in two eating sounds to choose between to play the eating sound effect.
-				SoundManager.instance.RandomizeSfx(eatSound1, eatSound2);
+				SoundManager.instance.RandomizeSfx (eatSound1, eatSound2);
 
 				//Disable the food object the player collided with.
-				other.gameObject.SetActive(false);
+				other.gameObject.SetActive (false);
 			}
 
 			//Check if the tag of the trigger collided with is Soda.
-			else if (other.tag == "Soda")
-			{
+			else if (other.tag == "Soda") {
 				//Add pointsPerSoda to players food points total
 				health += pointsPerSoda;
 
@@ -262,10 +257,12 @@ namespace Completed
 				foodText.text = "+" + pointsPerSoda + " Health: " + health;
 
 				//Call the RandomizeSfx function of SoundManager and pass in two drinking sounds to choose between to play the drinking sound effect.
-				SoundManager.instance.RandomizeSfx(drinkSound1, drinkSound2);
+				SoundManager.instance.RandomizeSfx (drinkSound1, drinkSound2);
 
 				//Disable the soda object the player collided with.
-				other.gameObject.SetActive(false);
+				other.gameObject.SetActive (false);
+			} else if (other.tag == "Enemy"){
+				LoseFood (1);
 			}
 		}
 		
@@ -290,7 +287,7 @@ namespace Completed
             health -= loss;
 
             //Update the food display with the new total.
-            foodText.text = "-" + loss + " Health: " + health;
+            foodText.text = "Losing Health!"+ " Health: " + health;
 
             //Check to see if game has ended.
             CheckIfGameOver();
