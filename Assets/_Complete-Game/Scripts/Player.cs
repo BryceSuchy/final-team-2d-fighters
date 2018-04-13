@@ -262,7 +262,18 @@ namespace Completed
 				//Disable the soda object the player collided with.
 				other.gameObject.SetActive (false);
 			} else if (other.tag == "Enemy"){
-				LoseFood (1);
+				bool enemyReadyToAttack = false;
+				//find which enemy
+				foreach (Enemy enemy in GameManager.instance.enemies) {
+					if (enemy.GetComponent<BoxCollider2D> ().Equals (other)) {
+						enemyReadyToAttack = enemy.isReadyToAttack();
+						break;
+					}
+				}
+
+				if (enemyReadyToAttack) {
+					LoseFood (20);
+				}
 			}
 		}
 		

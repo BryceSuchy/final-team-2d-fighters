@@ -14,7 +14,21 @@ namespace Completed
 		private Animator animator;							//Variable of type Animator to store a reference to the enemy's Animator component.
 		private Transform target;							//Transform to attempt to move toward each turn.
 		private bool skipMove;								//Boolean to determine whether or not enemy should skip a turn or move this turn.
-		
+		private float lastAttackTime;
+
+		public bool isReadyToAttack(){
+			
+			float currentTime = Time.time;
+			float delay = .5f;
+			Debug.Log ("Current time: " + currentTime + " Last attack time: " + lastAttackTime);
+			Debug.Log ("difference is " + (currentTime - lastAttackTime));
+			if (currentTime - lastAttackTime >= delay) {
+				lastAttackTime = currentTime;
+				Debug.Log ("Last attack time changed to: " + lastAttackTime);
+				return true;
+			}
+			return false;
+		}
 		
 		//Start overrides the virtual Start function of the base class.
 		protected override void Start ()
@@ -28,6 +42,8 @@ namespace Completed
 			
 			//Find the Player GameObject using it's tag and store a reference to its transform component.
 			target = GameObject.FindGameObjectWithTag ("Player").transform;
+
+			lastAttackTime = -5;
 			
 			//Call the start function of our base class MovingObject.
 			base.Start ();
