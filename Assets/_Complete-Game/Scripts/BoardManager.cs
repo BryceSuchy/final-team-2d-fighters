@@ -190,7 +190,11 @@ namespace Completed
 		public void SetupScene (int level)
 		{
 			string file = System.IO.Directory.GetCurrentDirectory () + "/Assets/_Complete-game/Levels/" + "Test" + ".csv";
+			if (level >= 5) {
+				file = System.IO.Directory.GetCurrentDirectory () + "/Assets/_Complete-game/Levels/" + "Hard" + ".csv";
+			}
 			string[] lines = System.IO.File.ReadAllLines(file);
+			Debug.Log (lines);
 			char[] comma = new char[] { ',' };
 			string[] firstRow = lines [0].Split (comma);
 			//need to rotate right while loading into the array, because the array gets rotated left

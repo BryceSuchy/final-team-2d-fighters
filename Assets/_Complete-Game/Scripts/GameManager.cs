@@ -141,7 +141,7 @@ namespace Completed
         public void GameOver()
         {
             //Set levelText to display number of levels passed and game over message
-            levelText.text = "You made it to Level: " + level + "and died.";
+            levelText.text = "You made it to Level: " + level + " and died.";
 
             //Enable black background image gameObject.
             levelImage.SetActive(true);
