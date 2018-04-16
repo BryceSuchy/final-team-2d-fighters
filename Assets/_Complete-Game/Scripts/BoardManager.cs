@@ -192,7 +192,7 @@ namespace Completed
 		public void SetupScene (int level)
 		{
 			string file = System.IO.Directory.GetCurrentDirectory () + "/Assets/_Complete-game/Levels/" + "Test" + ".csv";
-			if (level >= 5) {
+			if (level >= 2) {
 				file = System.IO.Directory.GetCurrentDirectory () + "/Assets/_Complete-game/Levels/" + "Hard" + ".csv";
 			}
 			string[] lines = System.IO.File.ReadAllLines(file);
