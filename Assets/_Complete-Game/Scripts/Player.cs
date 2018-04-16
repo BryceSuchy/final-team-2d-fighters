@@ -226,11 +226,13 @@ namespace Completed
 		{
 			//Check if the tag of the trigger collided with is Exit.
 			if (other.tag == "Exit") {
-				//Invoke the Restart function to start the next level with a delay of restartLevelDelay (default 1 second).
-				Invoke ("Restart", restartLevelDelay);
+                //Invoke the Restart function to start the next level with a delay of restartLevelDelay (default 1 second).
+                animator.SetInteger("ChestInt",1);
+                Invoke ("Restart", restartLevelDelay);
+                animator.SetInteger("ChestInt", 1);
 
-				//Disable the player object since level is over.
-				enabled = false;
+                //Disable the player object since level is over.
+                enabled = false;
 			}
 
 			//Check if the tag of the trigger collided with is Food.

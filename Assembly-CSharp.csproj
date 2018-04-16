@@ -59,12 +59,13 @@
      <Compile Include="Assets\_Complete-Game\Scripts\Player.cs" />
      <Compile Include="Assets\_Complete-Game\Scripts\SoundManager.cs" />
      <Compile Include="Assets\_Complete-Game\Scripts\Wall.cs" />
+     <Compile Include="Assets\Kickpixel - Dungeon Knight\scripts\KnightManager.cs" />
      <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
      <Compile Include="Assets\TutorialInfo\Scripts\TutorialInfo.cs" />
      <None Include="Assets\TutorialInfo\Fonts\LICENSE.txt" />
      <None Include="Assets\Fonts\OFL.txt" />
  <Reference Include="Facebook.Unity.Settings">
- <HintPath>C:/Users/Quinn/Desktop/School/Game dev/gitisstupid/final-team-2d-fighters/Library/FacebookSDK/Facebook.Unity.Settings.dll</HintPath>
+ <HintPath>C:/Users/Callahan/Documents/final313/final-team-2d-fighters/Library/FacebookSDK/Facebook.Unity.Settings.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
