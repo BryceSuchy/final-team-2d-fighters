@@ -10,7 +10,7 @@ namespace Completed
 	//Player inherits from MovingObject, our base class for objects that can move, Enemy also inherits from this.
 	public class Player : MovingObject
 	{
-		public float restartLevelDelay = 1f;
+		public float restartLevelDelay = 0f;
 		//Delay time in seconds to restart level.
 		public int pointsPerFood = 10;
 		//Number of points to add to player food points when picking up a food object.
@@ -35,6 +35,7 @@ namespace Completed
 		public AudioClip gameOverSound;
 		//Audio clip to play when player dies.
 
+		private float lastAttackTime;
 		private Animator animator;
 		//Used to store a reference to the Player's animator component.
 		private int health;
@@ -56,6 +57,8 @@ namespace Completed
 			//Set the foodText to reflect the current player food total.
 			foodText.text = "Health: " + health;
 
+			lastAttackTime = -5;
+
 			//Call the Start function of the MovingObject base class.
 			base.Start ();
 		}
@@ -68,25 +71,18 @@ namespace Completed
 			GameManager.instance.playerFoodPoints = health;
 		}
 
-		
-		private void Update ()
-		{
-			//If it's not the player's turn, exit the function.
-			//if(!GameManager.instance.playersTurn) return;
-			
+		private void DoPlayerMovement(){
 			float horizontal = 0;  	//Used to store the horizontal move direction.
 			float vertical = 0;		//Used to store the vertical move direction.
-			
+
 			//Check if we are running either in the Unity editor or in a standalone build.
-#if UNITY_STANDALONE || UNITY_WEBPLAYER
-			
+			#if UNITY_STANDALONE || UNITY_WEBPLAYER
+
 			//Get input from the input manager, round it to an integer and store in horizontal to set x axis move direction
 			horizontal = Input.GetAxisRaw ("Horizontal");
-			
+
 			//Get input from the input manager, round it to an integer and store in vertical to set y axis move direction
 			vertical = Input.GetAxisRaw ("Vertical");
-
-			Debug.Log ("Vert: " + vertical + ", Hor: " + horizontal);
 
 			float speed = .1f;
 
@@ -102,7 +98,7 @@ namespace Completed
 			if (float.IsNaN (newX)) {
 				newX = transform.position.x;
 			}
-				
+
 			if (float.IsNaN (newY)) {
 				newY = transform.position.y;
 			}
@@ -135,7 +131,7 @@ namespace Completed
 				rb2D.MovePosition (new Vector2 (newX, newY));
 				return;
 			}
-				
+
 			//can't move diagonally into walls, must move straight vertical or horizontal, so check if that's possible and do it
 
 			//test vertical first
@@ -187,54 +183,54 @@ namespace Completed
 
 
 
-			
+
 			//Check if moving horizontally, if so set vertical to zero.
 			/*if(horizontal != 0)
 			{
 				vertical = 0;
 			}*/
 			//Check if we are running on iOS, Android, Windows Phone 8 or Unity iPhone
-#elif UNITY_IOS || UNITY_ANDROID || UNITY_WP8 || UNITY_IPHONE
-			
+			#elif UNITY_IOS || UNITY_ANDROID || UNITY_WP8 || UNITY_IPHONE
+
 			//Check if Input has registered more than zero touches
 			if (Input.touchCount > 0)
 			{
-				//Store the first touch detected.
-				Touch myTouch = Input.touches[0];
-				
-				//Check if the phase of that touch equals Began
-				if (myTouch.phase == TouchPhase.Began)
-				{
-					//If so, set touchOrigin to the position of that touch
-					touchOrigin = myTouch.position;
-				}
-				
-				//If the touch phase is not Began, and instead is equal to Ended and the x of touchOrigin is greater or equal to zero:
-				else if (myTouch.phase == TouchPhase.Ended && touchOrigin.x >= 0)
-				{
-					//Set touchEnd to equal the position of this touch
-					Vector2 touchEnd = myTouch.position;
-					
-					//Calculate the difference between the beginning and end of the touch on the x axis.
-					float x = touchEnd.x - touchOrigin.x;
-					
-					//Calculate the difference between the beginning and end of the touch on the y axis.
-					float y = touchEnd.y - touchOrigin.y;
-					
-					//Set touchOrigin.x to -1 so that our else if statement will evaluate false and not repeat immediately.
-					touchOrigin.x = -1;
-					
-					//Check if the difference along the x axis is greater than the difference along the y axis.
-					if (Mathf.Abs(x) > Mathf.Abs(y))
-						//If x is greater than zero, set horizontal to 1, otherwise set it to -1
-						horizontal = x > 0 ? 1 : -1;
-					else
-						//If y is greater than zero, set horizontal to 1, otherwise set it to -1
-						vertical = y > 0 ? 1 : -1;
-				}
+			//Store the first touch detected.
+			Touch myTouch = Input.touches[0];
+
+			//Check if the phase of that touch equals Began
+			if (myTouch.phase == TouchPhase.Began)
+			{
+			//If so, set touchOrigin to the position of that touch
+			touchOrigin = myTouch.position;
 			}
-			
-#endif //End of mobile platform dependendent compilation section started above with #elif
+
+			//If the touch phase is not Began, and instead is equal to Ended and the x of touchOrigin is greater or equal to zero:
+			else if (myTouch.phase == TouchPhase.Ended && touchOrigin.x >= 0)
+			{
+			//Set touchEnd to equal the position of this touch
+			Vector2 touchEnd = myTouch.position;
+
+			//Calculate the difference between the beginning and end of the touch on the x axis.
+			float x = touchEnd.x - touchOrigin.x;
+
+			//Calculate the difference between the beginning and end of the touch on the y axis.
+			float y = touchEnd.y - touchOrigin.y;
+
+			//Set touchOrigin.x to -1 so that our else if statement will evaluate false and not repeat immediately.
+			touchOrigin.x = -1;
+
+			//Check if the difference along the x axis is greater than the difference along the y axis.
+			if (Mathf.Abs(x) > Mathf.Abs(y))
+			//If x is greater than zero, set horizontal to 1, otherwise set it to -1
+			horizontal = x > 0 ? 1 : -1;
+			else
+			//If y is greater than zero, set horizontal to 1, otherwise set it to -1
+			vertical = y > 0 ? 1 : -1;
+			}
+			}
+
+			#endif //End of mobile platform dependendent compilation section started above with #elif
 			//Check if we have a non-zero value for horizontal or vertical
 			/*if(horizontal != 0 || vertical != 0)
 			{
@@ -242,7 +238,26 @@ namespace Completed
 				//Pass in horizontal and vertical as parameters to specify the direction to move Player in.
 				AttemptMove<Wall> (horizontal, vertical);
 			}*/
+		}
 
+		private void AttemptAttack(){
+			float currentTime = Time.time;
+			float delay = 1.5f;
+			if (currentTime - lastAttackTime >= delay) {
+				lastAttackTime = currentTime;
+				//do an attack
+			}
+		}
+		
+		private void Update ()
+		{
+			//do player attacks
+			if (Input.GetKey (KeyCode.Space)) {
+				AttemptAttack ();
+			}
+
+			
+			DoPlayerMovement();
 		}
 		
 		//AttemptMove overrides the AttemptMove function in the base class MovingObject
