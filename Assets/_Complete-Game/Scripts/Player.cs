@@ -243,9 +243,18 @@ namespace Completed
 		private void AttemptAttack(){
 			float currentTime = Time.time;
 			float delay = 1.5f;
+			float range = 1;
 			if (currentTime - lastAttackTime >= delay) {
 				lastAttackTime = currentTime;
-				//do an attack
+				//do an attack by finding all enemies in range and killing them
+				RaycastHit2D[] inRange = Physics2D.CircleCastAll(new Vector2(transform.position.x, transform.position.y), 1, new Vector2(0,0), 0, blockingLayer); 
+
+				foreach (RaycastHit2D hit in inRange) {
+					if (hit.transform.tag == "Enemy") {
+						Enemy thisEnemy = hit.transform.gameObject.GetComponent<Enemy>();
+						thisEnemy.Kill ();
+					}
+				}
 			}
 		}
 		
