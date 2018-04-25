@@ -19,12 +19,9 @@ namespace Completed
 		public bool isReadyToAttack(){
 			
 			float currentTime = Time.time;
-			float delay = .5f;
-			Debug.Log ("Current time: " + currentTime + " Last attack time: " + lastAttackTime);
-			Debug.Log ("difference is " + (currentTime - lastAttackTime));
+			float delay = 1.5f;
 			if (currentTime - lastAttackTime >= delay) {
 				lastAttackTime = currentTime;
-				Debug.Log ("Last attack time changed to: " + lastAttackTime);
 				return true;
 			}
 			return false;
