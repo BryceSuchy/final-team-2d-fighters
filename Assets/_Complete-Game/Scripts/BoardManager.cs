@@ -192,9 +192,22 @@ namespace Completed
 		public void SetupScene (int level)
 		{
 			string file = System.IO.Directory.GetCurrentDirectory () + "/Assets/_Complete-game/Levels/" + "Test" + ".csv";
-			if (level >= 2) {
-				file = System.IO.Directory.GetCurrentDirectory () + "/Assets/_Complete-game/Levels/" + "Hard" + ".csv";
-			}
+            if (level == 2)
+            {
+                file = System.IO.Directory.GetCurrentDirectory() + "/Assets/_Complete-game/Levels/" + "Hard" + ".csv";
+            }
+            if (level == 3)
+            {
+               file = System.IO.Directory.GetCurrentDirectory() + "/Assets/_Complete-game/Levels/" + "Level3" + ".csv";
+            }
+            if(level == 4)
+            {
+                file = System.IO.Directory.GetCurrentDirectory() + "/Assets/_Complete-game/Levels/" + "Level4" + ".csv";
+            }
+            //else
+            //{
+            //    file = file = System.IO.Directory.GetCurrentDirectory() + "/Assets/_Complete-game/Levels/" + "GameCompleted" + ".csv";
+            //}
 			string[] lines = System.IO.File.ReadAllLines(file);
 			char[] comma = new char[] { ',' };
 			string[] firstRow = lines [0].Split (comma);
@@ -208,6 +221,7 @@ namespace Completed
 			for (int row = 0; row < height; row++) {
 				string[] tiles = lines [row].Split (comma);
 				for (int col = 0; col < width; col++) {
+                    //Debug.Log(tiles[col]);
 					layout [col,height - row - 1] = Convert.ToInt32 (tiles [col]);
 				}
 			}
