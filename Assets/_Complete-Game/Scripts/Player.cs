@@ -39,7 +39,9 @@ namespace Completed
 		private Animator animator;
 		//Used to store a reference to the Player's animator component.
 		private int health;
-		//Used to store player food points total during level.
+        //Used to store player food points total during level.
+        private bool hasKey;
+        //Used to store if the player has a key during the level
 		#if UNITY_IOS || UNITY_ANDROID || UNITY_WP8 || UNITY_IPHONE
         private Vector2 touchOrigin = -Vector2.one;	//Used to store location of screen touch origin for mobile controls.
 #endif
@@ -53,6 +55,9 @@ namespace Completed
 
 			//Get the current food point total stored in GameManager.instance between levels.
 			health = GameManager.instance.playerFoodPoints;
+
+            //checks if player has a key from the GameManager between levels
+            hasKey = GameManager.instance.playerHasKey;
 
 			//Set the foodText to reflect the current player food total.
 			foodText.text = "Health: " + health;
@@ -318,7 +323,7 @@ namespace Completed
 		private void OnTriggerEnter2D (Collider2D other)
 		{
 			//Check if the tag of the trigger collided with is Exit.
-			if (other.tag == "Exit") {
+			if (other.tag == "Exit" && hasKey == true) {
 				//Invoke the Restart function to start the next level with a delay of restartLevelDelay (default 1 second).
 				animator.SetInteger ("ChestInt", 1);
 				Invoke ("Restart", restartLevelDelay);
@@ -349,7 +354,8 @@ namespace Completed
 				health += pointsPerSoda;
 
 				//Update foodText to represent current total and notify player that they gained points
-				foodText.text = "+" + pointsPerSoda + " Health: " + health;
+				foodText.text = "+" + pointsPerSoda + " Health: " + health + "\tYou picked up a key!";
+                hasKey = true;
 
 				//Call the RandomizeSfx function of SoundManager and pass in two drinking sounds to choose between to play the drinking sound effect.
 				SoundManager.instance.RandomizeSfx (drinkSound1, drinkSound2);
