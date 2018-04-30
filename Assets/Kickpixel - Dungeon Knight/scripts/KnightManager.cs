@@ -13,7 +13,6 @@ public class KnightManager : MonoBehaviour {
 	void Update () {
 		if(Input.GetKeyDown(KeyCode.UpArrow))
         {
-			anim.
             anim.SetInteger("WalkValue",2);
         }
         if (Input.GetKeyDown(KeyCode.DownArrow))
