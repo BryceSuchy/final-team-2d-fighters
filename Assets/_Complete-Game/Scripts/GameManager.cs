@@ -23,12 +23,14 @@ namespace Completed
         public List<Enemy> enemies;                            //List of all Enemy units, used to issue them move commands.
         private bool enemiesMoving;                             //Boolean to check if enemies are moving.
         private bool doingSetup = true;                         //Boolean to check if we're setting up board, prevent Player from moving during setup.
+        public Button startButton;
 
 
 
         //Awake is always called before any Start functions
         void Awake()
         {
+
             //Check if instance already exists
             if (instance == null)
 
@@ -119,7 +121,10 @@ namespace Completed
 					enemy.MoveEnemy ();
 				}
 			}
-			/*//Check that playersTurn or enemiesMoving or doingSetup are not currently true.
+
+            if (Input.GetKey("escape"))
+                Application.Quit();
+            /*//Check that playersTurn or enemiesMoving or doingSetup are not currently true.
             if (playersTurn || enemiesMoving || doingSetup)
 
                 //If any of these are true, return and do not start MoveEnemies.
