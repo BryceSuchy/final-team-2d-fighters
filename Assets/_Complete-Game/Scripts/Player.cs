@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using UnityEditorInternal;
 
-	//Allows us to use UI.
+//Allows us to use UI.
 using UnityEngine.SceneManagement;
 
 namespace Completed
@@ -38,6 +39,7 @@ namespace Completed
 		private float lastAttackTime;
 		private Animator animator;
 		//Used to store a reference to the Player's animator component.
+		private int direction;
 		private int health;
 		//Used to store player food points total during level.
 		#if UNITY_IOS || UNITY_ANDROID || UNITY_WP8 || UNITY_IPHONE
@@ -71,7 +73,8 @@ namespace Completed
 			GameManager.instance.playerFoodPoints = health;
 		}
 
-		private void DoPlayerMovement(){
+		private void DoPlayerMovement ()
+		{
 			float horizontal = 0;  	//Used to store the horizontal move direction.
 			float vertical = 0;		//Used to store the vertical move direction.
 
@@ -79,10 +82,22 @@ namespace Completed
 			#if UNITY_STANDALONE || UNITY_WEBPLAYER
 
 			//Get input from the input manager, round it to an integer and store in horizontal to set x axis move direction
-			horizontal = Input.GetAxisRaw ("Horizontal");
+			//horizontal = Input.GetAxisRaw ("Horizontal");
 
 			//Get input from the input manager, round it to an integer and store in vertical to set y axis move direction
-			vertical = Input.GetAxisRaw ("Vertical");
+			//vertical = Input.GetAxisRaw ("Vertical");
+
+			if (Input.GetKey (KeyCode.W)) {
+				vertical = 1;
+			} else if (Input.GetKey (KeyCode.S)) {
+				vertical = -1;
+			}
+
+			if (Input.GetKey (KeyCode.A)) {
+				horizontal = -1;
+			} else if (Input.GetKey (KeyCode.D)) {
+				horizontal = 1;
+			}
 
 			float speed = .1f;
 
@@ -240,33 +255,61 @@ namespace Completed
 			}*/
 		}
 
-		private void AttemptAttack(){
+		private void AttemptAttack (string direction)
+		{
 			float currentTime = Time.time;
 			float delay = 1.5f;
-			float range = 1;
-			if (currentTime - lastAttackTime >= delay) {
-				lastAttackTime = currentTime;
-				//do an attack by finding all enemies in range and killing them
-				RaycastHit2D[] inRange = Physics2D.CircleCastAll(new Vector2(transform.position.x, transform.position.y), 1, new Vector2(0,0), 0, blockingLayer); 
+			float range = .75f;
+			if (currentTime - lastAttackTime < delay) {
+				return; //don't allow attacks before delay is over
+			}
+			lastAttackTime = currentTime;
+			//do an attack by finding all enemies in range and killing them
+			RaycastHit2D[] inRange = Physics2D.CircleCastAll (new Vector2 (transform.position.x, transform.position.y), 1, new Vector2 (0, 0), 0, blockingLayer); 
 
-				foreach (RaycastHit2D hit in inRange) {
-					if (hit.transform.tag == "Enemy") {
-						Enemy thisEnemy = hit.transform.gameObject.GetComponent<Enemy>();
-						thisEnemy.Kill ();
+			foreach (RaycastHit2D hit in inRange) {
+				if (hit.transform.tag == "Enemy") {
+					//check angle
+					float vDiff = hit.transform.position.y - transform.position.y;
+					float hDiff = hit.transform.position.x - transform.position.x;
+					bool canAttack = false;
+
+					if (direction == "Up" && vDiff >= 0 && vDiff >= Mathf.Abs(hDiff)) {
+						canAttack = true;
+					} else if (direction == "Down" && vDiff <= 0 && vDiff * -1 >= Mathf.Abs(hDiff)) {
+						canAttack = true;
+					} else if (direction == "Right" && hDiff >= 0 && hDiff >= Mathf.Abs(vDiff)) {
+						canAttack = true;
+					} else if (direction == "Left" && hDiff <= 0 && hDiff * -1 >= Mathf.Abs(vDiff)) {
+						canAttack = true;
 					}
+
+					if (!canAttack) {
+						return;
+					}
+
+					Enemy thisEnemy = hit.transform.gameObject.GetComponent<Enemy> ();
+					thisEnemy.Kill ();
 				}
 			}
+
 		}
-		
+
 		private void Update ()
 		{
 			//do player attacks
-			if (Input.GetKey (KeyCode.Space)) {
-				AttemptAttack ();
+			if (Input.GetKey (KeyCode.UpArrow)) {
+				AttemptAttack ("Up");
+			} else if (Input.GetKey (KeyCode.RightArrow)) {
+				AttemptAttack ("Right");
+			} else if (Input.GetKey (KeyCode.DownArrow)) {
+				AttemptAttack ("Down");
+			} else if (Input.GetKey (KeyCode.LeftArrow)) {
+				AttemptAttack ("Left");
 			}
 
 			
-			DoPlayerMovement();
+			DoPlayerMovement ();
 		}
 		
 		//AttemptMove overrides the AttemptMove function in the base class MovingObject
