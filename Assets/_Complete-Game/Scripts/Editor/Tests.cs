@@ -35,6 +35,17 @@ public class Tests {
         Assert.AreEqual(100, gm.playerFoodPoints);
     }
 
+    [Test]
+    public void TestEnemyCreate ()
+    {
+        GameObject obj = new GameObject();
+        Enemy en = obj.AddComponent<Enemy>();
+        GameManager gm = new GameManager();
+        gm.AddEnemyToList(en);
+        Assert.Contains(en, gm.enemies);
+        //Assert.AreEqual(en, gm.enemies.Contains(en));
+    }
+
     /*[Test]
     public void TestEnemyStart()
     {

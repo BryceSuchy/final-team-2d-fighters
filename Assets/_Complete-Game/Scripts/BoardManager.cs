@@ -191,16 +191,21 @@ namespace Completed
 		//SetupScene initializes our level and calls the previous functions to lay out the game board
 		public void SetupScene (int level)
 		{
-			string file = System.IO.Directory.GetCurrentDirectory () + "/Assets/_Complete-game/Levels/" + "Test" + ".csv";
-            if (level == 2)
+            string file = System.IO.Directory.GetCurrentDirectory() + "/Assets/_Complete-game/Levels/" + "Test" + ".csv"; ;
+            if (level == 1)
+            {
+                file = System.IO.Directory.GetCurrentDirectory() + "/Assets/_Complete-game/Levels/" + "Test" + ".csv";
+            }
+		
+            else if (level == 2)
             {
                 file = System.IO.Directory.GetCurrentDirectory() + "/Assets/_Complete-game/Levels/" + "Hard" + ".csv";
             }
-            if (level == 3)
+            else if (level == 3)
             {
                file = System.IO.Directory.GetCurrentDirectory() + "/Assets/_Complete-game/Levels/" + "Level3" + ".csv";
             }
-            if(level == 4)
+            else if(level == 4)
             {
                 file = System.IO.Directory.GetCurrentDirectory() + "/Assets/_Complete-game/Levels/" + "Level4" + ".csv";
             }
