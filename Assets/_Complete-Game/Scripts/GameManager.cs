@@ -17,6 +17,7 @@ namespace Completed
 
 
         private Text levelText;                                 //Text to display current level number.
+        private Text instructionText;
         private GameObject levelImage;                          //Image to block out level as levels are being set up, background for levelText.
         private BoardManager boardScript;                       //Store a reference to our BoardManager which will set up the level.
         private int level = 0;                                  //Current level number, expressed in game as "Day 1".
@@ -81,6 +82,8 @@ namespace Completed
 
             //Get a reference to our text LevelText's text component by finding it by name and calling GetComponent.
             levelText = GameObject.Find("LevelText").GetComponent<Text>();
+            instructionText = GameObject.Find("InstructionText").GetComponent<Text>();
+            instructionText.enabled = false;
 
             //Set the text of levelText to the string "Day" and append the current level number.
             levelText.text = "Level " + level;
@@ -121,6 +124,13 @@ namespace Completed
 
             if (Input.GetKey("escape"))
                 Application.Quit();
+
+            if (Input.GetKeyDown(KeyCode.B))
+            {
+                Destroy(gameObject);
+                SceneManager.UnloadScene(1);
+                SceneManager.LoadScene(3);
+            }
             /*//Check that playersTurn or enemiesMoving or doingSetup are not currently true.
             if (playersTurn || enemiesMoving || doingSetup)
 
@@ -145,11 +155,13 @@ namespace Completed
             //Set levelText to display number of levels passed and game over message
             levelText.text = "You made it to Level: " + level + " and died.";
 
+            instructionText.enabled = true;
+
             //Enable black background image gameObject.
             levelImage.SetActive(true);
 
             //Disable this GameManager.
-            enabled = false;
+            //enabled = false;
         }
 
         //Coroutine to move enemies in sequence.

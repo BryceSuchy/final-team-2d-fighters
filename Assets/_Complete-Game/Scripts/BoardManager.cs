@@ -196,7 +196,6 @@ namespace Completed
             {
                 file = System.IO.Directory.GetCurrentDirectory() + "/Assets/_Complete-game/Levels/" + "Test" + ".csv";
             }
-		
             else if (level == 2)
             {
                 file = System.IO.Directory.GetCurrentDirectory() + "/Assets/_Complete-game/Levels/" + "Hard" + ".csv";
@@ -209,10 +208,11 @@ namespace Completed
             {
                 file = System.IO.Directory.GetCurrentDirectory() + "/Assets/_Complete-game/Levels/" + "Level4" + ".csv";
             }
-            //else
-            //{
-            //    file = file = System.IO.Directory.GetCurrentDirectory() + "/Assets/_Complete-game/Levels/" + "GameCompleted" + ".csv";
-            //}
+            else if(level == 10)
+            {
+                file = System.IO.Directory.GetCurrentDirectory() + "/Assets/_Complete-game/Levels/" + "GameOver" + ".csv";
+            }
+            
 			string[] lines = System.IO.File.ReadAllLines(file);
 			char[] comma = new char[] { ',' };
 			string[] firstRow = lines [0].Split (comma);

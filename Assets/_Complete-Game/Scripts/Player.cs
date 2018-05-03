@@ -401,7 +401,7 @@ namespace Completed
 
 
 		//CheckIfGameOver checks if the player is out of food points and if so, ends the game.
-		private void CheckIfGameOver ()
+		public void CheckIfGameOver ()
 		{
 			//Check if food point total is less than or equal to zero.
 			if (health <= 0) {
@@ -409,12 +409,13 @@ namespace Completed
 				SoundManager.instance.PlaySingle (gameOverSound);
 
 				//Stop the background music.
-				SoundManager.instance.musicSource.Stop ();
+				//SoundManager.instance.musicSource.Stop ();
 
 				//Call the GameOver function of GameManager.
 				GameManager.instance.GameOver ();
-			}
-		}
+            }
+         
+        }
 	}
 }
 
