@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\_Complete-Game\Scripts\BoardManager.cs" />
+     <Compile Include="Assets\_Complete-Game\Scripts\ChestManager.cs" />
      <Compile Include="Assets\_Complete-Game\Scripts\Enemy.cs" />
      <Compile Include="Assets\_Complete-Game\Scripts\GameManager.cs" />
      <Compile Include="Assets\_Complete-Game\Scripts\Loader.cs" />
