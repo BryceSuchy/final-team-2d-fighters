@@ -429,7 +429,7 @@ namespace Completed
 
 
 		//CheckIfGameOver checks if the player is out of food points and if so, ends the game.
-		private void CheckIfGameOver ()
+		public void CheckIfGameOver ()
 		{
             //ts = System.DateTime.Now.ToUniversalTime() - dt;
             //timeText.text = "Time: " + ts.TotalSeconds.ToString();
@@ -439,12 +439,13 @@ namespace Completed
 				SoundManager.instance.PlaySingle (gameOverSound);
 
 				//Stop the background music.
-				SoundManager.instance.musicSource.Stop ();
+				//SoundManager.instance.musicSource.Stop ();
 
 				//Call the GameOver function of GameManager.
 				GameManager.instance.GameOver ();
-			}
-		}
+            }
+         
+        }
 	}
 }
 

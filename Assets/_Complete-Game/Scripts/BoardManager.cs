@@ -191,10 +191,28 @@ namespace Completed
 		//SetupScene initializes our level and calls the previous functions to lay out the game board
 		public void SetupScene (int level)
 		{
-			string file = System.IO.Directory.GetCurrentDirectory () + "/Assets/_Complete-game/Levels/" + "Test" + ".csv";
-			if (level >= 2) {
-				file = System.IO.Directory.GetCurrentDirectory () + "/Assets/_Complete-game/Levels/" + "Hard" + ".csv";
-			}
+            string file = System.IO.Directory.GetCurrentDirectory() + "/Assets/_Complete-game/Levels/" + "Test" + ".csv"; ;
+            if (level == 1)
+            {
+                file = System.IO.Directory.GetCurrentDirectory() + "/Assets/_Complete-game/Levels/" + "Test" + ".csv";
+            }
+            else if (level == 2)
+            {
+                file = System.IO.Directory.GetCurrentDirectory() + "/Assets/_Complete-game/Levels/" + "Hard" + ".csv";
+            }
+            else if (level == 3)
+            {
+               file = System.IO.Directory.GetCurrentDirectory() + "/Assets/_Complete-game/Levels/" + "Level3" + ".csv";
+            }
+            else if(level == 4)
+            {
+                file = System.IO.Directory.GetCurrentDirectory() + "/Assets/_Complete-game/Levels/" + "Level4" + ".csv";
+            }
+            else if(level == 10)
+            {
+                file = System.IO.Directory.GetCurrentDirectory() + "/Assets/_Complete-game/Levels/" + "GameOver" + ".csv";
+            }
+            
 			string[] lines = System.IO.File.ReadAllLines(file);
 			char[] comma = new char[] { ',' };
 			string[] firstRow = lines [0].Split (comma);
@@ -208,6 +226,7 @@ namespace Completed
 			for (int row = 0; row < height; row++) {
 				string[] tiles = lines [row].Split (comma);
 				for (int col = 0; col < width; col++) {
+                    //Debug.Log(tiles[col]);
 					layout [col,height - row - 1] = Convert.ToInt32 (tiles [col]);
 				}
 			}
