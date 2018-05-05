@@ -51,8 +51,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\TutorialInfo\Scripts\Editor\ReadmeEditor.cs" />
-     <Compile Include="Assets\TutorialInfo\Scripts\Editor\TutorialInfoEditor.cs" />
+     <Compile Include="Assets\_Complete-Game\Scripts\Editor\Tests.cs" />
  <Reference Include="Facebook.Unity.Settings">
  <HintPath>C:/Users/Callahan/Documents/team2dfighter/final-team-2d-fighters/Library/FacebookSDK/Facebook.Unity.Settings.dll</HintPath>
  </Reference>
