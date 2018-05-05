@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\_Complete-Game\Scripts\BoardManager.cs" />
+     <Compile Include="Assets\_Complete-Game\Scripts\ChestManager.cs" />
      <Compile Include="Assets\_Complete-Game\Scripts\Enemy.cs" />
      <Compile Include="Assets\_Complete-Game\Scripts\GameManager.cs" />
      <Compile Include="Assets\_Complete-Game\Scripts\Loader.cs" />
@@ -65,7 +66,7 @@
      <None Include="Assets\TutorialInfo\Fonts\LICENSE.txt" />
      <None Include="Assets\Fonts\OFL.txt" />
  <Reference Include="Facebook.Unity.Settings">
- <HintPath>C:/Users/Quinn/Desktop/School/Game dev/gitisstupid/final-team-2d-fighters/Library/FacebookSDK/Facebook.Unity.Settings.dll</HintPath>
+ <HintPath>C:/Users/Callahan/Documents/team2dfighter/final-team-2d-fighters/Library/FacebookSDK/Facebook.Unity.Settings.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
