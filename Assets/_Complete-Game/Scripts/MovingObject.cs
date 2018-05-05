@@ -20,8 +20,8 @@ namespace Completed
 		{
 			//Get a component reference to this object's BoxCollider2D
 			boxCollider = GetComponent <BoxCollider2D> ();
-			
-			//Get a component reference to this object's Rigidbody2D
+
+            //Get a component reference to this object's Rigidbody2D
 			rb2D = GetComponent <Rigidbody2D> ();
 			
 			//By storing the reciprocal of the move time we can use it by multiplying instead of dividing, this is more efficient.
