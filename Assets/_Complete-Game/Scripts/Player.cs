@@ -41,8 +41,8 @@ namespace Completed
 		public AudioClip gameOverSound;
         //Audio clip to play when player dies.
         public float speed = .1f;
-
-        private float lastAttackTime;
+        
+		public float lastAttackTime;
 		private Animator animator;
 		//Used to store a reference to the Player's animator component.
 		private int direction;
@@ -251,11 +251,8 @@ namespace Completed
 			//do an attack by finding all enemies in range and killing them
             RaycastHit2D[] inRange = Physics2D.CircleCastAll(new Vector2(transform.position.x, transform.position.y), range, new Vector2(0, 0), 0);
 
-            Debug.Log("hit " + inRange.Length + " things ");
-
 			foreach (RaycastHit2D hit in inRange) {
 				if (hit.transform.tag == "Enemy") {
-                    Debug.Log("hit something");
 					//check angle
 					float vDiff = hit.transform.position.y - transform.position.y;
 					float hDiff = hit.transform.position.x - transform.position.x;

@@ -123,8 +123,6 @@ public class Playertest {
         Enemy mockEnemy = go.AddComponent<Enemy>();
         mockEnemy.lastAttackTime = -5;
         BoxCollider2D collider = go.AddComponent<BoxCollider2D>();
-        Debug.Log("enemy.collider? " + (mockEnemy.GetComponent<BoxCollider2D>() != null));
-        Debug.Log("Equal? " + mockEnemy.GetComponent<BoxCollider2D>().Equals(collider));
         collider.tag = "Enemy";
         gameManager.enemies.Add(mockEnemy);
         player.OnTriggerEnter2D(collider);
@@ -171,13 +169,10 @@ public class Playertest {
         collider.tag = "Enemy";
         collider.enabled = true;
         go.layer = player.blockingLayer;
-
-        Debug.Log("Collider is in blocking layer? " + collider.IsTouchingLayers(LayerMask.NameToLayer("BlockingLayer")));
-        InputWrapper.SetKey(KeyCode.UpArrow);
-        Debug.Log("is active? " + go.activeSelf);
-        player.Update();
-        Debug.Log("is active after attack? " + go.activeSelf);
         
-        Assert.IsFalse(go.activeSelf);
+        InputWrapper.SetKey(KeyCode.UpArrow);
+        player.Update();
+        
+        Assert.IsFalse(go.activeSelf); //test that the enemy was "killed"
     }
 }
