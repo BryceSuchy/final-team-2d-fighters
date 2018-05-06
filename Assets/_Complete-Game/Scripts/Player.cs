@@ -9,7 +9,7 @@ using UnityEngine.SceneManagement;
 namespace Completed
 {
 	//Player inherits from MovingObject, our base class for objects that can move, Enemy also inherits from this.
-	public class Player : MovingObject
+	public class Player : MovingObject, IComponent
 	{
 		public float restartLevelDelay = 0f;
 		//Delay time in seconds to restart level.
@@ -45,21 +45,45 @@ namespace Completed
 		private Animator animator;
 		//Used to store a reference to the Player's animator component.
 		private int direction;
-		private int health;
-        //Used to store player food points total during level.
+		public int health;
+        //Used to store player food points total during level.	
         private bool hasKey;
         //Used to store if the player has a key during the level
-        public static Player instance = null;
-#if UNITY_IOS || UNITY_ANDROID || UNITY_WP8 || UNITY_IPHONE
-        private Vector2 touchOrigin = -Vector2.one;	//Used to store location of screen touch origin for mobile controls.
-#endif
+        public static Player instance = null;	
 
+        //dependency injections, etc. for unit testing
+        IComponent componentProvider;
+        public IGameManager gameManagerService;
+        public RigidBodyWrapper rigidBody;
+        public bool attackTracker;
+		
+		//Start overrides the Start function of MovingObject
+		protected override void Start ()
+		{
+            if(componentProvider == null)
+            {
+                //Get a component reference to the Player's animator component
+                componentProvider = this;
+            }
+            
+            if(gameManagerService == null) {
+                gameManagerService = GameManager.instance;
+            }
 
-        //Start overrides the Start function of MovingObject
-        protected override void Start ()
-        {
-            //Get a component reference to the Player's animator component
-            animator = GetComponent<Animator>();
+            rigidBody = new RigidBodyWrapper(this);
+
+            attackTracker = false;
+
+            animator = componentProvider.GetComponent<Animator> ();
+
+			//Get the current food point total stored in GameManager.instance between levels.
+			health = gameManagerService.playerFoodPoints;
+
+            if (foodText != null)
+            {
+                //Set the foodText to reflect the current player food total.
+                foodText.text = "Health: " + health;
+            }
 
             //Get the current food point total stored in GameManager.instance between levels.
             health = GameManager.instance.playerFoodPoints;
@@ -101,16 +125,7 @@ namespace Completed
 			float horizontal = 0;  	//Used to store the horizontal move direction.
 			float vertical = 0;		//Used to store the vertical move direction.
 
-			//Check if we are running either in the Unity editor or in a standalone build.
-			#if UNITY_STANDALONE || UNITY_WEBPLAYER
-
-			//Get input from the input manager, round it to an integer and store in horizontal to set x axis move direction
-			//horizontal = Input.GetAxisRaw ("Horizontal");
-
-			//Get input from the input manager, round it to an integer and store in vertical to set y axis move direction
-			//vertical = Input.GetAxisRaw ("Vertical");
-
-			if (Input.GetKey (KeyCode.W)) {
+			if (InputWrapper.GetKey (KeyCode.W)) {
 				vertical = 1;
 			} else if (Input.GetKey (KeyCode.S)) {
 				vertical = -1;
@@ -130,8 +145,7 @@ namespace Completed
 			float newX = transform.position.x + horizontal / ratio;
 			float newY = transform.position.y + vertical / ratio;
 
-			BoxCollider2D boxCollider = GetComponent <BoxCollider2D> ();
-			Rigidbody2D rb2D = GetComponent <Rigidbody2D> ();
+			BoxCollider2D boxCollider = componentProvider.GetComponent <BoxCollider2D> ();
 
 			if (float.IsNaN (newX)) {
 				newX = transform.position.x;
@@ -147,26 +161,32 @@ namespace Completed
 			// Calculate end position based on the direction parameters passed in when calling Move.
 			Vector2 end = new Vector2 (newX, newY);
 
-			//Disable the boxCollider so that linecast doesn't hit this object's own collider. Shouldn't matter with LinecastAll though
-			boxCollider.enabled = false;
+            bool hitAWall = false;
+            if (boxCollider != null)
+            {
 
-			//Cast a line from start point to end point checking collision on blockingLayer.
-			RaycastHit2D[] hits = Physics2D.LinecastAll (start, end, blockingLayer);
+                //Disable the boxCollider so that linecast doesn't hit this object's own collider. Shouldn't matter with LinecastAll though
+                boxCollider.enabled = false;
 
-			//Re-enable boxCollider after linecast
-			boxCollider.enabled = true;
+                //Cast a line from start point to end point checking collision on blockingLayer.
+                RaycastHit2D[] hits = Physics2D.LinecastAll(start, end, blockingLayer);
 
-			bool hitAWall = false;
-			foreach (RaycastHit2D hit in hits) {
-				if (hit.transform.tag == "Wall") {
-					hitAWall = true;
-					break;
-				}
-			}
+                //Re-enable boxCollider after linecast
+                boxCollider.enabled = true;
+
+                foreach (RaycastHit2D hit in hits)
+                {
+                    if (hit.transform.tag == "Wall")
+                    {
+                        hitAWall = true;
+                        break;
+                    }
+                }
+            }
 
 			if (!hitAWall) {
 				//If nothing was hit, move player to destination
-				rb2D.MovePosition (new Vector2 (newX, newY));
+				rigidBody.MovePosition (new Vector2 (newX, newY));
 				return;
 			}
 
@@ -181,9 +201,9 @@ namespace Completed
 			newX = transform.position.x;
 			end = new Vector2 (newX, newY);
 			boxCollider.enabled = false;
-			hits = Physics2D.LinecastAll (start, end, blockingLayer);
+			RaycastHit2D[] hits2 = Physics2D.LinecastAll (start, end, blockingLayer);
 			hitAWall = false;
-			foreach (RaycastHit2D hit in hits) {
+			foreach (RaycastHit2D hit in hits2) {
 				if (hit.transform.tag == "Wall") {
 					hitAWall = true;
 					break;
@@ -191,7 +211,7 @@ namespace Completed
 			}
 			boxCollider.enabled = true;
 			if (!hitAWall) {
-				rb2D.MovePosition (new Vector2 (newX, newY));
+				rigidBody.MovePosition (new Vector2 (newX, newY));
 				return;
 			}
 
@@ -205,9 +225,9 @@ namespace Completed
 			newY = transform.position.y;
 			end = new Vector2 (newX, newY);
 			boxCollider.enabled = false;
-			hits = Physics2D.LinecastAll (start, end, blockingLayer);
+			hits2 = Physics2D.LinecastAll (start, end, blockingLayer);
 			hitAWall = false;
-			foreach (RaycastHit2D hit in hits) {
+			foreach (RaycastHit2D hit in hits2) {
 				if (hit.transform.tag == "Wall") {
 					hitAWall = true;
 					break;
@@ -215,67 +235,9 @@ namespace Completed
 			}
 			boxCollider.enabled = true;
 			if (!hitAWall) {
-				rb2D.MovePosition (new Vector2 (newX, newY));
+				rigidBody.MovePosition (new Vector2 (newX, newY));
 				return;
 			}
-
-
-
-
-			//Check if moving horizontally, if so set vertical to zero.
-			/*if(horizontal != 0)
-			{
-				vertical = 0;
-			}*/
-			//Check if we are running on iOS, Android, Windows Phone 8 or Unity iPhone
-			#elif UNITY_IOS || UNITY_ANDROID || UNITY_WP8 || UNITY_IPHONE
-
-			//Check if Input has registered more than zero touches
-			if (Input.touchCount > 0)
-			{
-			//Store the first touch detected.
-			Touch myTouch = Input.touches[0];
-
-			//Check if the phase of that touch equals Began
-			if (myTouch.phase == TouchPhase.Began)
-			{
-			//If so, set touchOrigin to the position of that touch
-			touchOrigin = myTouch.position;
-			}
-
-			//If the touch phase is not Began, and instead is equal to Ended and the x of touchOrigin is greater or equal to zero:
-			else if (myTouch.phase == TouchPhase.Ended && touchOrigin.x >= 0)
-			{
-			//Set touchEnd to equal the position of this touch
-			Vector2 touchEnd = myTouch.position;
-
-			//Calculate the difference between the beginning and end of the touch on the x axis.
-			float x = touchEnd.x - touchOrigin.x;
-
-			//Calculate the difference between the beginning and end of the touch on the y axis.
-			float y = touchEnd.y - touchOrigin.y;
-
-			//Set touchOrigin.x to -1 so that our else if statement will evaluate false and not repeat immediately.
-			touchOrigin.x = -1;
-
-			//Check if the difference along the x axis is greater than the difference along the y axis.
-			if (Mathf.Abs(x) > Mathf.Abs(y))
-			//If x is greater than zero, set horizontal to 1, otherwise set it to -1
-			horizontal = x > 0 ? 1 : -1;
-			else
-			//If y is greater than zero, set horizontal to 1, otherwise set it to -1
-			vertical = y > 0 ? 1 : -1;
-			}
-			}
-
-			#endif //End of mobile platform dependendent compilation section started above with #elif
-			//Check if we have a non-zero value for horizontal or vertical
-			/*if(horizontal != 0 || vertical != 0)
-			{
-				//Call AttemptMove passing in the generic parameter Wall, since that is what Player may interact with if they encounter one (by attacking it)
-				//Pass in horizontal and vertical as parameters to specify the direction to move Player in.
-				AttemptMove<Wall> (horizontal, vertical);
-			}*/
 		}
 
 		private void AttemptAttack (string direction)
@@ -286,9 +248,10 @@ namespace Completed
 			if (currentTime - lastAttackTime < delay) {
 				return; //don't allow attacks before delay is over
 			}
+            attackTracker = true;
 			lastAttackTime = currentTime;
 			//do an attack by finding all enemies in range and killing them
-			RaycastHit2D[] inRange = Physics2D.CircleCastAll (new Vector2 (transform.position.x, transform.position.y), 1, new Vector2 (0, 0), 0, blockingLayer); 
+			RaycastHit2D[] inRange = Physics2D.CircleCastAll (new Vector2 (transform.position.x, transform.position.y), range, new Vector2 (0, 0), 0, blockingLayer); 
 
 			foreach (RaycastHit2D hit in inRange) {
 				if (hit.transform.tag == "Enemy") {
@@ -307,21 +270,18 @@ namespace Completed
 						canAttack = true;
 					}
 
-					if (!canAttack) {
-						return;
+					if (canAttack) {
+						Enemy thisEnemy = hit.transform.gameObject.GetComponent<Enemy> ();
+						thisEnemy.Kill ();
 					}
-
-					Enemy thisEnemy = hit.transform.gameObject.GetComponent<Enemy> ();
-					thisEnemy.Kill ();
 				}
 			}
-
 		}
 
-		private void Update ()
+		public void Update ()
 		{
 			//do player attacks
-			if (Input.GetKey (KeyCode.UpArrow)) {
+			if (InputWrapper.GetKey (KeyCode.UpArrow)) {
 				AttemptAttack ("Up");
 			} else if (Input.GetKey (KeyCode.RightArrow)) {
 				AttemptAttack ("Right");
@@ -333,38 +293,8 @@ namespace Completed
 
 			
 			DoPlayerMovement ();
-		}
-		
-		//AttemptMove overrides the AttemptMove function in the base class MovingObject
-		//AttemptMove takes a generic parameter T which for Player will be of the type Wall, it also takes integers for x and y direction to move in.
-		protected override void AttemptMove <T> (int xDir, int yDir)
-		{
-			Debug.Log ("in method AttemptMove of Player");
-			//Every time player moves, subtract from food points total.
-			
-			//Update food text display to reflect current score.
-			foodText.text = "Health: " + health;
-            
+		}		
 
-            //Call the AttemptMove method of the base class, passing in the component T (in this case Wall) and x and y direction to move.
-            base.AttemptMove <T> (xDir, yDir);
-			
-			//Hit allows us to reference the result of the Linecast done in Move.
-			RaycastHit2D hit;
-			
-			//If Move returns true, meaning Player was able to move into an empty space.
-			if (Move (xDir, yDir, out hit)) {
-				//Call RandomizeSfx of SoundManager to play the move sound, passing in two audio clips to choose from.
-				SoundManager.instance.RandomizeSfx (moveSound1, moveSound2);
-			}
-			
-			//Since the player has moved and lost food points, check if the game has ended.
-			CheckIfGameOver ();
-			
-			//Set the playersTurn boolean of GameManager to false now that players turn is over.
-			GameManager.instance.playersTurn = false;
-		}
-		
 		
 		//OnCantMove overrides the abstract function OnCantMove in MovingObject.
 		//It takes a generic parameter T which in the case of Player is a Wall which the player can attack and destroy.
@@ -382,7 +312,7 @@ namespace Completed
 		
 		
 		//OnTriggerEnter2D is sent when another object enters a trigger collider attached to this object (2D physics only).
-		private void OnTriggerEnter2D (Collider2D other)
+		public void OnTriggerEnter2D (Collider2D other)
 		{
             //Check if the tag of the trigger collided with is Exit.
             if (other.tag == "Exit" && hasKey == true) {
@@ -427,7 +357,7 @@ namespace Completed
 			} else if (other.tag == "Enemy") {
 				bool enemyReadyToAttack = false;
 				//find which enemy
-				foreach (Enemy enemy in GameManager.instance.enemies) {
+				foreach (Enemy enemy in gameManagerService.enemies) {
 					if (enemy.GetComponent<BoxCollider2D> ().Equals (other)) {
 						enemyReadyToAttack = enemy.isReadyToAttack ();
 						break;
@@ -454,18 +384,44 @@ namespace Completed
 		//It takes a parameter loss which specifies how many points to lose.
 		public void LoseFood (int loss)
 		{
-			//Set the trigger for the player animator to transition to the playerHit animation.
-			//animator.SetTrigger ("playerHit");
+            if (animator != null)
+            {
+                //Set the trigger for the player animator to transition to the playerHit animation.
+                animator.SetTrigger("playerHit");
+            }
 
 			//Subtract lost food points from the players total.
 			health -= loss;
 
-			//Update the food display with the new total.
-			foodText.text = "Losing Health!" + " Health: " + health;
+            if (foodText != null)
+            {
+                //Update the food display with the new total.
+                foodText.text = "Losing Health!" + " Health: " + health;
+            }
 
 			//Check to see if game has ended.
 			CheckIfGameOver ();
 		}
+
+		public void PublicStart(){
+			Start ();
+		}
+
+        public void setComponentProvider(IComponent provider)
+        {
+            componentProvider = provider;
+        }
+
+        public void setGameManagerService(IGameManager service)
+        {
+            gameManagerService = service;
+        }
+
+        /*public void setRB2DAndBoxCollider()
+        {
+            gameObject.AddComponent<Rigidbody2D>();
+            gameObject.AddComponent<BoxCollider2D>();
+        }*/
 
 
 		//CheckIfGameOver checks if the player is out of food points and if so, ends the game.
@@ -473,19 +429,20 @@ namespace Completed
 		{
             //ts = System.DateTime.Now.ToUniversalTime() - dt;
             //timeText.text = "Time: " + ts.TotalSeconds.ToString();
-            //Check if food point total is less than or equal to zero.
-            if (health <= 0) {
-				//Call the PlaySingle function of SoundManager and pass it the gameOverSound as the audio clip to play.
-				SoundManager.instance.PlaySingle (gameOverSound);
+			//Check if food point total is less than or equal to zero.
+			if (health <= 0) {
+                if (SoundManager.instance != null)
+                {
+                    //Call the PlaySingle function of SoundManager and pass it the gameOverSound as the audio clip to play.
+                    SoundManager.instance.PlaySingle(gameOverSound);
 
-				//Stop the background music.
-				//SoundManager.instance.musicSource.Stop ();
+                    //Stop the background music.
+                    SoundManager.instance.musicSource.Stop();
+                }
 
 				//Call the GameOver function of GameManager.
-				GameManager.instance.GameOver ();
-            }
-         
-        }
+				gameManagerService.GameOver ();
+			}
+		}
 	}
 }
-

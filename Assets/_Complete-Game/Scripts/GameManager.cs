@@ -7,14 +7,15 @@ namespace Completed
     using System.Collections.Generic;       //Allows us to use Lists. 
     using UnityEngine.UI;                   //Allows us to use UI.
 
-    public class GameManager : MonoBehaviour
+    public class GameManager : IGameManager
     {
         public float levelStartDelay = 0f;                      //Time to wait before starting level, in seconds.
         public float turnDelay = 0.1f;                          //Delay between each Player turn.
-        public int playerFoodPoints = 100;                      //Starting value for Player food points
+        //public int playerFoodPoints = 100;                      //Starting value for Player food points
         public System.DateTime startingTime = System.DateTime.Now.ToUniversalTime();  //starting time for the game
         public bool playerHasKey = false;                        //starting value for if Player has key
         public static GameManager instance;              //Static instance of GameManager which allows it to be accessed by any other script.
+
         [HideInInspector] public bool playersTurn = true;       //Boolean to check if it's players turn, hidden in inspector but public.
 
 
@@ -22,8 +23,10 @@ namespace Completed
         private Text instructionText;
         private GameObject levelImage;                          //Image to block out level as levels are being set up, background for levelText.
         private BoardManager boardScript;                       //Store a reference to our BoardManager which will set up the level.
+
         private int level = 0;                                  //Current level number, expressed in game as "Day 1".
-        public List<Enemy> enemies;                            //List of all Enemy units, used to issue them move commands.
+        //public List<Enemy> enemies;                            //List of all Enemy units, used to issue them move commands.
+
         private bool enemiesMoving;                             //Boolean to check if enemies are moving.
         private bool doingSetup = true;                         //Boolean to check if we're setting up board, prevent Player from moving during setup.
         public Button startButton;
@@ -31,7 +34,7 @@ namespace Completed
 
 
         //Awake is always called before any Start functions
-        void Awake()
+        public void Awake()
         {
 
             //Check if instance already exists
@@ -55,7 +58,12 @@ namespace Completed
             //Get a component reference to the attached BoardManager script
             boardScript = GetComponent<BoardManager>();
 
-           
+
+            playerFoodPoints = 100;
+
+            //Call the InitGame function to initialize the first level 
+            InitGame();
+
         }
 
         //this is called only once, and the paramter tell it to be called only after the scene was loaded
@@ -152,7 +160,7 @@ namespace Completed
 
 
         //GameOver is called when the player reaches 0 food points
-        public void GameOver()
+        public override void GameOver()
         {
             //Set levelText to display number of levels passed and game over message
             levelText.text = "You made it to Level: " + level + " and died.";

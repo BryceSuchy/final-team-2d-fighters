@@ -63,20 +63,25 @@
     <Compile Include="Assets\_Complete-Game\Scripts\ChestManager.cs" />
     <Compile Include="Assets\_Complete-Game\Scripts\Enemy.cs" />
     <Compile Include="Assets\_Complete-Game\Scripts\GameManager.cs" />
+    <Compile Include="Assets\_Complete-Game\Scripts\IComponent.cs" />
+    <Compile Include="Assets\_Complete-Game\Scripts\IGameManager.cs" />
+    <Compile Include="Assets\_Complete-Game\Scripts\InputWrapper.cs" />
+    <Compile Include="Assets\_Complete-Game\Scripts\IText.cs" />
     <Compile Include="Assets\_Complete-Game\Scripts\Loader.cs" />
     <Compile Include="Assets\_Complete-Game\Scripts\LoadSceneOnClick.cs" />
     <Compile Include="Assets\_Complete-Game\Scripts\MovingObject.cs" />
     <Compile Include="Assets\_Complete-Game\Scripts\Player.cs" />
     <Compile Include="Assets\_Complete-Game\Scripts\QuitOnClick.cs" />
+    <Compile Include="Assets\_Complete-Game\Scripts\RigidBodyWrapper.cs" />
     <Compile Include="Assets\_Complete-Game\Scripts\SoundManager.cs" />
     <Compile Include="Assets\_Complete-Game\Scripts\Wall.cs" />
     <Compile Include="Assets\Kickpixel - Dungeon Knight\scripts\KnightManager.cs" />
     <None Include="Assets\Fonts\OFL.txt" />
-    <Reference Include="Unity.PackageManagerUI.Editor">
-      <HintPath>C:/Users/Quinn/Desktop/School/Game dev/gitisstupid/final-team-2d-fighters/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEditor.StandardEvents">
       <HintPath>C:/Users/Quinn/Desktop/School/Game dev/gitisstupid/final-team-2d-fighters/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.PackageManagerUI.Editor">
+      <HintPath>C:/Users/Quinn/Desktop/School/Game dev/gitisstupid/final-team-2d-fighters/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AIModule">
       <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>

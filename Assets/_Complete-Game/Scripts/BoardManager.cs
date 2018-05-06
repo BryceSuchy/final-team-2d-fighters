@@ -133,6 +133,7 @@ namespace Completed
 					if (type == 2) {
 						//Choose a random tile from tileArray and assign it to tileChoice
 						GameObject foodChoice = foodTiles [Random.Range (0, foodTiles.Length)];
+                        Debug.Log("length? " + foodTiles.Length);
 
 						//Instantiate tileChoice at the position returned by RandomPosition with no change in rotation
 						Instantiate (foodChoice, position, Quaternion.identity);
