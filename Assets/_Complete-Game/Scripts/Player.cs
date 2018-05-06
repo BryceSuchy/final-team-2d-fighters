@@ -20,8 +20,13 @@ namespace Completed
 		public int wallDamage = 1;
 		//How much damage a player does to a wall when chopping it.
 		public Text foodText;
-		//UI Text to display current player food total.
-		public AudioClip moveSound1;
+        //UI Text to display current player food total.
+        public Text timeText;
+        public System.DateTime dt;
+        public System.TimeSpan ts;
+        public bool isChestOpen;
+        //UI Text to display current player food total.
+        public AudioClip moveSound1;
 		//1 of 2 Audio clips to play when player moves.
 		public AudioClip moveSound2;
 		//2 of 2 Audio clips to play when player moves.
@@ -41,7 +46,10 @@ namespace Completed
 		//Used to store a reference to the Player's animator component.
 		private int direction;
 		public int health;
-        //Used to store player food points total during level.		
+        //Used to store player food points total during level.	
+        private bool hasKey;
+        //Used to store if the player has a key during the level
+        public static Player instance = null;	
 
         //dependency injections, etc. for unit testing
         IComponent componentProvider;
@@ -77,14 +85,36 @@ namespace Completed
                 foodText.text = "Health: " + health;
             }
 
-			lastAttackTime = -5;
+            //Get the current food point total stored in GameManager.instance between levels.
+            health = GameManager.instance.playerFoodPoints;
 
-			//Call the Start function of the MovingObject base class.
-			base.Start ();
-		}
-		
-		//This function is called when the behaviour becomes disabled or inactive.
-		private void OnDisable ()
+            //checks if player has a key from the GameManager between levels
+            hasKey = GameManager.instance.playerHasKey;
+
+            //gets the starting time of the game
+            dt = GameManager.instance.startingTime;
+            isChestOpen = false;
+            //Set the foodText to reflect the current player food total.
+            foodText.text = "Health: " + health;
+            
+            updateTime();
+            //sets the timeText to reflect the currents time
+            //timeText.text = "ASDASDASDSAD"; //for testing purposes
+            lastAttackTime = -5;
+
+            //Call the Start function of the MovingObject base class.
+            base.Start();
+        }
+
+        private void updateTime()
+        {
+         //   ts = System.DateTime.Now.ToUniversalTime() - dt;
+         //   timeText.text = "Time: " + ((int)(ts.TotalSeconds)).ToString();
+        }
+
+
+        //This function is called when the behaviour becomes disabled or inactive.
+        private void OnDisable ()
 		{
 			//When Player object is disabled, store the current local food total in the GameManager so it can be re-loaded in next level.
 			GameManager.instance.playerFoodPoints = health;
@@ -264,6 +294,7 @@ namespace Completed
 			
 			DoPlayerMovement ();
 		}		
+
 		
 		//OnCantMove overrides the abstract function OnCantMove in MovingObject.
 		//It takes a generic parameter T which in the case of Player is a Wall which the player can attack and destroy.
@@ -283,12 +314,12 @@ namespace Completed
 		//OnTriggerEnter2D is sent when another object enters a trigger collider attached to this object (2D physics only).
 		public void OnTriggerEnter2D (Collider2D other)
 		{
-			//Check if the tag of the trigger collided with is Exit.
-			if (other.tag == "Exit") {
-				//Invoke the Restart function to start the next level with a delay of restartLevelDelay (default 1 second).
-				animator.SetInteger ("ChestInt", 1);
+            //Check if the tag of the trigger collided with is Exit.
+            if (other.tag == "Exit" && hasKey == true) {
+                //Invoke the Restart function to start the next level with a delay of restartLevelDelay (default 1 second).
+                //animator.SetTrigger("OpenChest");
+                isChestOpen = true;
 				Invoke ("Restart", restartLevelDelay);
-				animator.SetInteger ("ChestInt", 1);
 
 				//Disable the player object since level is over.
 				enabled = false;
@@ -315,7 +346,8 @@ namespace Completed
 				health += pointsPerSoda;
 
 				//Update foodText to represent current total and notify player that they gained points
-				foodText.text = "+" + pointsPerSoda + " Health: " + health;
+				foodText.text = "+" + pointsPerSoda + " Health: " + health + "\tYou picked up a key!";
+                hasKey = true;
 
 				//Call the RandomizeSfx function of SoundManager and pass in two drinking sounds to choose between to play the drinking sound effect.
 				SoundManager.instance.RandomizeSfx (drinkSound1, drinkSound2);
@@ -323,7 +355,6 @@ namespace Completed
 				//Disable the soda object the player collided with.
 				other.gameObject.SetActive (false);
 			} else if (other.tag == "Enemy") {
-                Debug.Log("reached here");
 				bool enemyReadyToAttack = false;
 				//find which enemy
 				foreach (Enemy enemy in gameManagerService.enemies) {
@@ -394,8 +425,10 @@ namespace Completed
 
 
 		//CheckIfGameOver checks if the player is out of food points and if so, ends the game.
-		private void CheckIfGameOver ()
+		public void CheckIfGameOver ()
 		{
+            //ts = System.DateTime.Now.ToUniversalTime() - dt;
+            //timeText.text = "Time: " + ts.TotalSeconds.ToString();
 			//Check if food point total is less than or equal to zero.
 			if (health <= 0) {
                 if (SoundManager.instance != null)

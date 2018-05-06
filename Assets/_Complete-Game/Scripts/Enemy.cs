@@ -75,7 +75,7 @@ namespace Completed
         }
 
 
-        //MoveEnemy is called by the GameManger each turn to tell each Enemy to try to move towards the player.
+        //MoveEnemy is called by the GameManger each frame to tell each Enemy to try to move towards the player.
         public void MoveEnemy()
         {
             float speed = .03f;
@@ -103,17 +103,26 @@ namespace Completed
             boxCollider.enabled = false;
 
             //Cast a line from start point to end point checking collision on blockingLayer.
-            RaycastHit2D hit = Physics2D.Linecast(start, end, blockingLayer);
+            //RaycastHit2D hit = Physics2D.Linecast(start, end, blockingLayer);
+            RaycastHit2D[] hits = Physics2D.LinecastAll(start, end, blockingLayer);
 
             //Re-enable boxCollider after linecast
             boxCollider.enabled = true;
 
             //Check if anything was hit
-            if (hit.transform == null)
+            bool wallHit = false;
+            foreach(RaycastHit2D hit in hits)
+            {
+                if(hit.transform.tag == "Wall")
+                {
+                    wallHit = true;
+                    break;
+                }
+            }
+            if (!wallHit)
             {
                 //If nothing was hit, move enemy to destination
                 rb2D.MovePosition(new Vector2(newX, newY));
-
             }
 
 
