@@ -3,6 +3,7 @@ using UnityEngine.TestTools;
 using NUnit.Framework;
 using System.Collections.Generic;
 using Completed;
+using UnityEngine.UI;
 
 public class Playertest {
     public class MockComponentProvider : IComponent
@@ -130,18 +131,53 @@ public class Playertest {
         Assert.AreNotEqual(currentHealth, player.health);
     }
 
-    //test ideas
-    //8 food text indicates that player is losing health after they lose some
-    //9 player moves correct distance diagonally
-    //10 enemy in range is killed
+    //8
+    [Test]
+    public void FoodTextChangesAfterLosingHealth()
+    {
+        GameObject textOb = new GameObject();
+        player.foodText = textOb.AddComponent<Text>();
+        player.PublicStart();
+        string currentText = player.foodText.text;
+        player.LoseFood(10);
+        Assert.AreNotEqual(currentText, player.foodText.text);
+    }
 
+    //9
+    [Test]
+    public void PlayerMovesCorrectDistanceDiagonally()
+    {
+        player.PublicStart();
+        player.rigidBody.startSpying();
+        InputWrapper.SetKey(KeyCode.W);
+        InputWrapper.SetKey(KeyCode.A);
+        Vector2 oldPos = player.transform.position;
+        player.Update();
+        Vector2 newPos = player.rigidBody.lastPosition;
+        float distanceTraveled = Vector2.Distance(oldPos, newPos);
+        Assert.AreEqual(distanceTraveled, player.speed);
+    }
 
-    /*// A UnityTest behaves like a coroutine in PlayMode
-	// and allows you to yield null to skip a frame in EditMode
-	[UnityTest]
-	public IEnumerator PlayertestWithEnumeratorPasses() {
-		// Use the Assert class to test conditions.
-		// yield to skip a frame
-		yield return null;
-	}*/
+    //10
+    [Test]
+    public void EnemyInRangeIsKilled()
+    {
+        player.PublicStart();
+        player.rigidBody.startSpying();
+        GameObject go = new GameObject();
+        Enemy mockEnemy = go.AddComponent<Enemy>();
+        mockEnemy.transform.position = new Vector2(0, .5f);
+        BoxCollider2D collider = go.AddComponent<BoxCollider2D>();
+        collider.tag = "Enemy";
+        collider.enabled = true;
+        go.layer = player.blockingLayer;
+
+        Debug.Log("Collider is in blocking layer? " + collider.IsTouchingLayers(LayerMask.NameToLayer("BlockingLayer")));
+        InputWrapper.SetKey(KeyCode.UpArrow);
+        Debug.Log("is active? " + go.activeSelf);
+        player.Update();
+        Debug.Log("is active after attack? " + go.activeSelf);
+        
+        Assert.IsFalse(go.activeSelf);
+    }
 }

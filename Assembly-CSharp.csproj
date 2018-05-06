@@ -66,7 +66,6 @@
     <Compile Include="Assets\_Complete-Game\Scripts\IComponent.cs" />
     <Compile Include="Assets\_Complete-Game\Scripts\IGameManager.cs" />
     <Compile Include="Assets\_Complete-Game\Scripts\InputWrapper.cs" />
-    <Compile Include="Assets\_Complete-Game\Scripts\IText.cs" />
     <Compile Include="Assets\_Complete-Game\Scripts\Loader.cs" />
     <Compile Include="Assets\_Complete-Game\Scripts\LoadSceneOnClick.cs" />
     <Compile Include="Assets\_Complete-Game\Scripts\MovingObject.cs" />

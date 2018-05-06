@@ -39,9 +39,10 @@ namespace Completed
 		public AudioClip drinkSound2;
 		//2 of 2 Audio clips to play when player collects a soda object.
 		public AudioClip gameOverSound;
-		//Audio clip to play when player dies.
+        //Audio clip to play when player dies.
+        public float speed = .1f;
 
-		private float lastAttackTime;
+        private float lastAttackTime;
 		private Animator animator;
 		//Used to store a reference to the Player's animator component.
 		private int direction;
@@ -85,17 +86,16 @@ namespace Completed
                 foodText.text = "Health: " + health;
             }
 
-            //Get the current food point total stored in GameManager.instance between levels.
-            health = GameManager.instance.playerFoodPoints;
+            if (GameManager.instance != null)
+            {
 
-            //checks if player has a key from the GameManager between levels
-            hasKey = GameManager.instance.playerHasKey;
+                //checks if player has a key from the GameManager between levels
+                hasKey = GameManager.instance.playerHasKey;
 
-            //gets the starting time of the game
-            dt = GameManager.instance.startingTime;
+                //gets the starting time of the game
+                dt = GameManager.instance.startingTime;
+            }
             isChestOpen = false;
-            //Set the foodText to reflect the current player food total.
-            foodText.text = "Health: " + health;
             
             updateTime();
             //sets the timeText to reflect the currents time
@@ -127,17 +127,15 @@ namespace Completed
 
 			if (InputWrapper.GetKey (KeyCode.W)) {
 				vertical = 1;
-			} else if (Input.GetKey (KeyCode.S)) {
+			} else if (InputWrapper.GetKey (KeyCode.S)) {
 				vertical = -1;
 			}
 
-			if (Input.GetKey (KeyCode.A)) {
+			if (InputWrapper.GetKey (KeyCode.A)) {
 				horizontal = -1;
-			} else if (Input.GetKey (KeyCode.D)) {
+			} else if (InputWrapper.GetKey (KeyCode.D)) {
 				horizontal = 1;
 			}
-
-			float speed = .1f;
 
 			float totalDis = Mathf.Sqrt (Mathf.Pow (horizontal, 2) + Mathf.Pow (vertical, 2));
 			float ratio = totalDis / speed;
@@ -251,10 +249,13 @@ namespace Completed
             attackTracker = true;
 			lastAttackTime = currentTime;
 			//do an attack by finding all enemies in range and killing them
-			RaycastHit2D[] inRange = Physics2D.CircleCastAll (new Vector2 (transform.position.x, transform.position.y), range, new Vector2 (0, 0), 0, blockingLayer); 
+            RaycastHit2D[] inRange = Physics2D.CircleCastAll(new Vector2(transform.position.x, transform.position.y), range, new Vector2(0, 0), 0);
+
+            Debug.Log("hit " + inRange.Length + " things ");
 
 			foreach (RaycastHit2D hit in inRange) {
 				if (hit.transform.tag == "Enemy") {
+                    Debug.Log("hit something");
 					//check angle
 					float vDiff = hit.transform.position.y - transform.position.y;
 					float hDiff = hit.transform.position.x - transform.position.x;
@@ -283,11 +284,11 @@ namespace Completed
 			//do player attacks
 			if (InputWrapper.GetKey (KeyCode.UpArrow)) {
 				AttemptAttack ("Up");
-			} else if (Input.GetKey (KeyCode.RightArrow)) {
+			} else if (InputWrapper.GetKey (KeyCode.RightArrow)) {
 				AttemptAttack ("Right");
-			} else if (Input.GetKey (KeyCode.DownArrow)) {
+			} else if (InputWrapper.GetKey (KeyCode.DownArrow)) {
 				AttemptAttack ("Down");
-			} else if (Input.GetKey (KeyCode.LeftArrow)) {
+			} else if (InputWrapper.GetKey (KeyCode.LeftArrow)) {
 				AttemptAttack ("Left");
 			}
 
