@@ -133,7 +133,6 @@ namespace Completed
 					if (type == 2) {
 						//Choose a random tile from tileArray and assign it to tileChoice
 						GameObject foodChoice = foodTiles [Random.Range (0, foodTiles.Length)];
-                        Debug.Log("length? " + foodTiles.Length);
 
 						//Instantiate tileChoice at the position returned by RandomPosition with no change in rotation
 						Instantiate (foodChoice, position, Quaternion.identity);
@@ -227,7 +226,6 @@ namespace Completed
 			for (int row = 0; row < height; row++) {
 				string[] tiles = lines [row].Split (comma);
 				for (int col = 0; col < width; col++) {
-                    //Debug.Log(tiles[col]);
 					layout [col,height - row - 1] = Convert.ToInt32 (tiles [col]);
 				}
 			}

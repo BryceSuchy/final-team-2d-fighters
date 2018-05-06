@@ -8,6 +8,7 @@ namespace Completed
         private MonoBehaviour parent;
         private bool spying;
         public bool movePositionCalled;
+        public Vector2 lastPosition;
         
         public RigidBodyWrapper(MonoBehaviour parent)
         {
@@ -27,6 +28,7 @@ namespace Completed
             if (spying)
             {
                 movePositionCalled = true;
+                lastPosition = destination;
             } else
             {
                 rigidBody.MovePosition(destination);
