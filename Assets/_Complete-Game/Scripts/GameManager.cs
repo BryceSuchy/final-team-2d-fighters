@@ -9,26 +9,31 @@ namespace Completed
 
     public class GameManager : MonoBehaviour
     {
-        public float levelStartDelay = 2f;                      //Time to wait before starting level, in seconds.
+        public float levelStartDelay = 0f;                      //Time to wait before starting level, in seconds.
         public float turnDelay = 0.1f;                          //Delay between each Player turn.
-        public int playerFoodPoints = 100;                      //Starting value for Player food points.
-        public static GameManager instance = null;              //Static instance of GameManager which allows it to be accessed by any other script.
+        public int playerFoodPoints = 100;                      //Starting value for Player food points
+        public System.DateTime startingTime = System.DateTime.Now.ToUniversalTime();  //starting time for the game
+        public bool playerHasKey = false;                        //starting value for if Player has key
+        public static GameManager instance;              //Static instance of GameManager which allows it to be accessed by any other script.
         [HideInInspector] public bool playersTurn = true;       //Boolean to check if it's players turn, hidden in inspector but public.
 
 
         private Text levelText;                                 //Text to display current level number.
+        private Text instructionText;
         private GameObject levelImage;                          //Image to block out level as levels are being set up, background for levelText.
         private BoardManager boardScript;                       //Store a reference to our BoardManager which will set up the level.
-        private int level = 1;                                  //Current level number, expressed in game as "Day 1".
+        private int level = 0;                                  //Current level number, expressed in game as "Day 1".
         public List<Enemy> enemies;                            //List of all Enemy units, used to issue them move commands.
         private bool enemiesMoving;                             //Boolean to check if enemies are moving.
         private bool doingSetup = true;                         //Boolean to check if we're setting up board, prevent Player from moving during setup.
+        public Button startButton;
 
 
 
         //Awake is always called before any Start functions
         void Awake()
         {
+
             //Check if instance already exists
             if (instance == null)
 
@@ -50,24 +55,21 @@ namespace Completed
             //Get a component reference to the attached BoardManager script
             boardScript = GetComponent<BoardManager>();
 
-            //Call the InitGame function to initialize the first level 
-            InitGame();
+           
         }
 
         //this is called only once, and the paramter tell it to be called only after the scene was loaded
         //(otherwise, our Scene Load callback would be called the very first load, and we don't want that)
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        static public void CallbackInitialization()
-        {
-            //register the callback to be called everytime the scene is loaded
-            SceneManager.sceneLoaded += OnSceneLoaded;
-        }
+       
 
         //This is called each time a scene is loaded.
-        static private void OnSceneLoaded(Scene arg0, LoadSceneMode arg1)
+        private void OnLevelWasLoaded(int index)
         {
-            instance.level++;
-            instance.InitGame();
+            if (index == 1)
+            {
+                level++;
+                InitGame();
+            }
         }
 
 
@@ -82,6 +84,8 @@ namespace Completed
 
             //Get a reference to our text LevelText's text component by finding it by name and calling GetComponent.
             levelText = GameObject.Find("LevelText").GetComponent<Text>();
+            instructionText = GameObject.Find("InstructionText").GetComponent<Text>();
+            instructionText.enabled = false;
 
             //Set the text of levelText to the string "Day" and append the current level number.
             levelText.text = "Level " + level;
@@ -119,7 +123,17 @@ namespace Completed
 					enemy.MoveEnemy ();
 				}
 			}
-			/*//Check that playersTurn or enemiesMoving or doingSetup are not currently true.
+
+            if (Input.GetKey("escape"))
+                Application.Quit();
+
+            if (Input.GetKeyDown(KeyCode.B))
+            {
+                Destroy(gameObject);
+                SceneManager.UnloadScene(1);
+                SceneManager.LoadScene(3);
+            }
+            /*//Check that playersTurn or enemiesMoving or doingSetup are not currently true.
             if (playersTurn || enemiesMoving || doingSetup)
 
                 //If any of these are true, return and do not start MoveEnemies.
@@ -143,11 +157,13 @@ namespace Completed
             //Set levelText to display number of levels passed and game over message
             levelText.text = "You made it to Level: " + level + " and died.";
 
+            instructionText.enabled = true;
+
             //Enable black background image gameObject.
             levelImage.SetActive(true);
 
             //Disable this GameManager.
-            enabled = false;
+            //enabled = false;
         }
 
         //Coroutine to move enemies in sequence.
