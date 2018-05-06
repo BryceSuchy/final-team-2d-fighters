@@ -108,8 +108,8 @@ namespace Completed
 
         private void updateTime()
         {
-         //   ts = System.DateTime.Now.ToUniversalTime() - dt;
-         //   timeText.text = "Time: " + ((int)(ts.TotalSeconds)).ToString();
+            ts = System.DateTime.Now.ToUniversalTime() - dt;
+            timeText.text = "Time: " + ((int)(ts.TotalSeconds)).ToString();
         }
 
 
@@ -288,7 +288,7 @@ namespace Completed
 			} else if (InputWrapper.GetKey (KeyCode.LeftArrow)) {
 				AttemptAttack ("Left");
 			}
-
+            updateTime();
 			
 			DoPlayerMovement ();
 		}		
