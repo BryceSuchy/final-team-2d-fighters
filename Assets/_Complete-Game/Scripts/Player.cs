@@ -41,7 +41,7 @@ namespace Completed
 		public AudioClip gameOverSound;
 		//Audio clip to play when player dies.
 
-		private float lastAttackTime;
+		public float lastAttackTime;
 		private Animator animator;
 		//Used to store a reference to the Player's animator component.
 		private int direction;
