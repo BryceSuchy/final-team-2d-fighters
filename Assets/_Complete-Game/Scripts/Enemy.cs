@@ -19,7 +19,9 @@ namespace Completed
 		public bool isReadyToAttack(){
 			
 			float currentTime = Time.time;
-			float delay = 1.5f;
+            Debug.Log(currentTime);
+            Debug.Log(lastAttackTime);
+            float delay = 1.5f;
 			if (currentTime - lastAttackTime >= delay) {
 				lastAttackTime = currentTime;
 				return true;
@@ -45,6 +47,11 @@ namespace Completed
 			//Call the start function of our base class MovingObject.
 			base.Start ();
 		}
+
+        public void Start1()
+        {
+            Start();
+        }
 		
 		
 		//Override the AttemptMove function of MovingObject to include functionality needed for Enemy to skip turns.

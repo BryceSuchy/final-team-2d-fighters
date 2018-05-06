@@ -29,7 +29,7 @@ namespace Completed
 
 
         //Awake is always called before any Start functions
-        void Awake()
+        public void Awake()
         {
 
             //Check if instance already exists
@@ -42,10 +42,16 @@ namespace Completed
             else if (instance != this)
 
                 //Then destroy this. This enforces our singleton pattern, meaning there can only ever be one instance of a GameManager.
-                Destroy(gameObject);
-
+                if (Application.isPlaying)
+                {
+                    Destroy(gameObject);
+                }
             //Sets this to not be destroyed when reloading scene
-            DontDestroyOnLoad(gameObject);
+            if (Application.isPlaying)
+            {
+                DontDestroyOnLoad(gameObject);
+            }
+            
 
             //Assign enemies to a new List of Enemy objects.
             enemies = new List<Enemy>();

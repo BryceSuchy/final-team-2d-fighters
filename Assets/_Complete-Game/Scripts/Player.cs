@@ -65,7 +65,7 @@ namespace Completed
 		
 		
 		//This function is called when the behaviour becomes disabled or inactive.
-		private void OnDisable ()
+		public void OnDisable ()
 		{
 			//When Player object is disabled, store the current local food total in the GameManager so it can be re-loaded in next level.
 			GameManager.instance.playerFoodPoints = health;
