@@ -435,7 +435,7 @@ namespace Completed
                     SoundManager.instance.PlaySingle(gameOverSound);
 
                     //Stop the background music.
-                    SoundManager.instance.musicSource.Stop();
+                    //SoundManager.instance.musicSource.Stop();
                 }
 
 				//Call the GameOver function of GameManager.
