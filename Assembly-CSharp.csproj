@@ -69,7 +69,7 @@
      <Compile Include="Assets\Kickpixel - Dungeon Knight\scripts\KnightManager.cs" />
      <None Include="Assets\Fonts\OFL.txt" />
  <Reference Include="Facebook.Unity.Settings">
- <HintPath>C:/Users/Callahan/Documents/final2dfighter/final-team-2d-fighters/Library/FacebookSDK/Facebook.Unity.Settings.dll</HintPath>
+ <HintPath>C:/Users/Callahan/Documents/final313/final-team-2d-fighters/Library/FacebookSDK/Facebook.Unity.Settings.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>

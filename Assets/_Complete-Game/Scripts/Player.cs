@@ -97,7 +97,6 @@ namespace Completed
             }
             isChestOpen = false;
             
-            updateTime();
             //sets the timeText to reflect the currents time
             //timeText.text = "ASDASDASDSAD"; //for testing purposes
             lastAttackTime = -5;
@@ -120,12 +119,31 @@ namespace Completed
 			GameManager.instance.playerFoodPoints = health;
 		}
 
-		private void DoPlayerMovement ()
+		public void DoPlayerMovement ()
 		{
 			float horizontal = 0;  	//Used to store the horizontal move direction.
-			float vertical = 0;		//Used to store the vertical move direction.
+			float vertical = 0;     //Used to store the vertical move direction.
 
-			if (InputWrapper.GetKey (KeyCode.W)) {
+            //do player attacks
+            if (InputWrapper.GetKey(KeyCode.UpArrow))
+            {
+                AttemptAttack("Up");
+            }
+            else if (InputWrapper.GetKey(KeyCode.RightArrow))
+            {
+                AttemptAttack("Right");
+            }
+            else if (InputWrapper.GetKey(KeyCode.DownArrow))
+            {
+                AttemptAttack("Down");
+            }
+            else if (InputWrapper.GetKey(KeyCode.LeftArrow))
+            {
+                AttemptAttack("Left");
+            }
+
+            // Movement
+            if (InputWrapper.GetKey (KeyCode.W)) {
 				vertical = 1;
 			} else if (InputWrapper.GetKey (KeyCode.S)) {
 				vertical = -1;
@@ -241,7 +259,7 @@ namespace Completed
 		private void AttemptAttack (string direction)
 		{
 			float currentTime = Time.time;
-			float delay = 1.5f;
+			float delay = .75f;
 			float range = .75f;
 			if (currentTime - lastAttackTime < delay) {
 				return; //don't allow attacks before delay is over
@@ -278,18 +296,7 @@ namespace Completed
 
 		public void Update ()
 		{
-			//do player attacks
-			if (InputWrapper.GetKey (KeyCode.UpArrow)) {
-				AttemptAttack ("Up");
-			} else if (InputWrapper.GetKey (KeyCode.RightArrow)) {
-				AttemptAttack ("Right");
-			} else if (InputWrapper.GetKey (KeyCode.DownArrow)) {
-				AttemptAttack ("Down");
-			} else if (InputWrapper.GetKey (KeyCode.LeftArrow)) {
-				AttemptAttack ("Left");
-			}
             updateTime();
-			
 			DoPlayerMovement ();
 		}		
 
@@ -361,7 +368,7 @@ namespace Completed
 						break;
 					}
 				}
-
+                
 				if (enemyReadyToAttack) {
 					LoseFood (20);
 				}

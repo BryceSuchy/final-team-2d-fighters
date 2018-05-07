@@ -47,7 +47,7 @@ public class Playertest {
         
     }
 
-    //1
+    //
     [Test]
 	public void PlayerCanBeCreated() {
         player.PublicStart();
@@ -55,7 +55,8 @@ public class Playertest {
         Assert.IsTrue(true);
 	}
 
-    //2
+//-----------movement------------//
+    //
     [Test]
     public void PlayerMovesOnPressingW()
     {
@@ -63,42 +64,170 @@ public class Playertest {
         player.PublicStart();
         player.rigidBody.startSpying();
         InputWrapper.SetKey(KeyCode.W);
-        player.Update();
+        player.DoPlayerMovement();
         Assert.IsTrue(player.rigidBody.movePositionCalled);
     }
-
-    //3
+    //
     [Test]
-    public void PlayerTakesDamageFromLoseFood()
+    public void PlayerMovesOnPressingA()
     {
         player.PublicStart();
-        int health = player.health;
-        player.LoseFood(10);
-        Assert.IsTrue(health != player.health);
+        player.rigidBody.startSpying();
+        InputWrapper.SetKey(KeyCode.A);
+        player.DoPlayerMovement();
+        Assert.IsTrue(player.rigidBody.movePositionCalled);
     }
-
-    //4
+    //
     [Test]
-    public void GameOverWhenPlayerRunsOutOfHealth()
+    public void PlayerMovesOnPressingS()
     {
         player.PublicStart();
-        player.LoseFood(100);
-        Assert.IsTrue(gameManager.gameOverCalled);
+        player.rigidBody.startSpying();
+        InputWrapper.SetKey(KeyCode.S);
+        player.DoPlayerMovement();
+        Assert.IsTrue(player.rigidBody.movePositionCalled);
     }
-
-    //5
+    //
     [Test]
-    public void PlayerAttacksOnHittingArrowKey()
+    public void PlayerMovesOnPressingD()
+    {
+        player.PublicStart();
+        player.rigidBody.startSpying();
+        InputWrapper.SetKey(KeyCode.D);
+        player.DoPlayerMovement();
+        Assert.IsTrue(player.rigidBody.movePositionCalled);
+    }
+    //
+    [Test]
+    public void PlayerMovesCorrectDistanceDiagonallyWA()
+    {
+        player.PublicStart();
+        player.rigidBody.startSpying();
+        InputWrapper.SetKey(KeyCode.W);
+        InputWrapper.SetKey(KeyCode.A);
+        Vector2 oldPos = player.transform.position;
+        player.DoPlayerMovement();
+        Vector2 newPos = player.rigidBody.lastPosition;
+        float distanceTraveled = Vector2.Distance(oldPos, newPos);
+        Assert.AreEqual(distanceTraveled, player.speed);
+    }
+    //
+    [Test]
+    public void PlayerMovesCorrectDistanceDiagonallyWD()
+    {
+        player.PublicStart();
+        player.rigidBody.startSpying();
+        InputWrapper.SetKey(KeyCode.W);
+        InputWrapper.SetKey(KeyCode.D);
+        Vector2 oldPos = player.transform.position;
+        player.DoPlayerMovement();
+        Vector2 newPos = player.rigidBody.lastPosition;
+        float distanceTraveled = Vector2.Distance(oldPos, newPos);
+        Assert.AreEqual(distanceTraveled, player.speed);
+    }
+    //
+    [Test]
+    public void PlayerMovesCorrectDistanceDiagonallySA()
+    {
+        player.PublicStart();
+        player.rigidBody.startSpying();
+        InputWrapper.SetKey(KeyCode.S);
+        InputWrapper.SetKey(KeyCode.A);
+        Vector2 oldPos = player.transform.position;
+        player.DoPlayerMovement();
+        Vector2 newPos = player.rigidBody.lastPosition;
+        float distanceTraveled = Vector2.Distance(oldPos, newPos);
+        Assert.AreEqual(distanceTraveled, player.speed);
+    }
+    //
+    [Test]
+    public void PlayerMovesCorrectDistanceDiagonallySD()
+    {
+        player.PublicStart();
+        player.rigidBody.startSpying();
+        InputWrapper.SetKey(KeyCode.S);
+        InputWrapper.SetKey(KeyCode.D);
+        Vector2 oldPos = player.transform.position;
+        player.DoPlayerMovement();
+        Vector2 newPos = player.rigidBody.lastPosition;
+        float distanceTraveled = Vector2.Distance(oldPos, newPos);
+        Assert.AreEqual(distanceTraveled, player.speed);
+    }
+    //
+    [Test]
+    public void PlayerDoesNotMoveWhenADPressed()
+    {
+        player.PublicStart();
+        player.rigidBody.startSpying();
+        InputWrapper.SetKey(KeyCode.A);
+        InputWrapper.SetKey(KeyCode.D);
+        Vector2 oldPos = player.transform.position;
+        player.DoPlayerMovement();
+        Vector2 newPos = player.rigidBody.lastPosition;
+        float distanceTraveled = Vector2.Distance(oldPos, newPos);
+        Assert.AreEqual(distanceTraveled, player.speed);
+    }
+    //
+    [Test]
+    public void PlayerDoesNotMoveWhenWSPressed()
+    {
+        player.PublicStart();
+        player.rigidBody.startSpying();
+        InputWrapper.SetKey(KeyCode.W);
+        InputWrapper.SetKey(KeyCode.S);
+        Vector2 oldPos = player.transform.position;
+        player.DoPlayerMovement();
+        Vector2 newPos = player.rigidBody.lastPosition;
+        float distanceTraveled = Vector2.Distance(oldPos, newPos);
+        Assert.AreEqual(distanceTraveled, player.speed);
+    }
+   
+    //-----------Attacks------------//
+    //
+    [Test]
+    public void PlayerAttacksOnHittingUpKey()
     {
         player.PublicStart();
         player.attackTracker = false;
         InputWrapper.SetKey(KeyCode.UpArrow);
         player.rigidBody.startSpying();
-        player.Update();
+        player.DoPlayerMovement();
         Assert.IsTrue(player.attackTracker);
     }
-
-    //6
+    //
+    [Test]
+    public void PlayerAttacksOnHittingLeftKey()
+    {
+        player.PublicStart();
+        player.attackTracker = false;
+        InputWrapper.SetKey(KeyCode.LeftArrow);
+        player.rigidBody.startSpying();
+        player.DoPlayerMovement();
+        Assert.IsTrue(player.attackTracker);
+    }
+    //
+    [Test]
+    public void PlayerAttacksOnHittingDownKey()
+    {
+        player.PublicStart();
+        player.attackTracker = false;
+        InputWrapper.SetKey(KeyCode.DownArrow);
+        player.rigidBody.startSpying();
+        player.DoPlayerMovement();
+        Assert.IsTrue(player.attackTracker);
+    }
+    //
+    [Test]
+    public void PlayerAttacksOnHittingRightKey()
+    {
+        player.PublicStart();
+        player.attackTracker = false;
+        InputWrapper.SetKey(KeyCode.RightArrow);
+        player.rigidBody.startSpying();
+        player.DoPlayerMovement();
+        Assert.IsTrue(player.attackTracker);
+    }
+    //
     [Test]
     public void PlayerDoesNotAttackDuringDelay()
     {
@@ -106,14 +235,14 @@ public class Playertest {
         player.attackTracker = false;
         InputWrapper.SetKey(KeyCode.UpArrow);
         player.rigidBody.startSpying();
-        player.Update();
+        player.DoPlayerMovement();
         player.attackTracker = false;
         //do two attacks as fast as possible, the code should run fast enough that the second one is during the delay
-        player.Update();
+        player.DoPlayerMovement();
         Assert.IsFalse(player.attackTracker);
     }
 
-    //7
+    //
     [Test]
     public void PlayerTakesDamageFromEnemyCollision()
     {
@@ -129,7 +258,7 @@ public class Playertest {
         Assert.AreNotEqual(currentHealth, player.health);
     }
 
-    //8
+    //
     [Test]
     public void FoodTextChangesAfterLosingHealth()
     {
@@ -140,23 +269,6 @@ public class Playertest {
         player.LoseFood(10);
         Assert.AreNotEqual(currentText, player.foodText.text);
     }
-
-    //9
-    [Test]
-    public void PlayerMovesCorrectDistanceDiagonally()
-    {
-        player.PublicStart();
-        player.rigidBody.startSpying();
-        InputWrapper.SetKey(KeyCode.W);
-        InputWrapper.SetKey(KeyCode.A);
-        Vector2 oldPos = player.transform.position;
-        player.Update();
-        Vector2 newPos = player.rigidBody.lastPosition;
-        float distanceTraveled = Vector2.Distance(oldPos, newPos);
-        Assert.AreEqual(distanceTraveled, player.speed);
-    }
-
-    //10
     [Test]
     public void EnemyInRangeIsKilled()
     {
@@ -169,10 +281,31 @@ public class Playertest {
         collider.tag = "Enemy";
         collider.enabled = true;
         go.layer = player.blockingLayer;
-        
+
         InputWrapper.SetKey(KeyCode.UpArrow);
-        player.Update();
-        
+        player.DoPlayerMovement();
+
         Assert.IsFalse(go.activeSelf); //test that the enemy was "killed"
     }
+
+    //
+    [Test]
+    public void PlayerTakesDamageFromLoseFood()
+    {
+        player.PublicStart();
+        int health = player.health;
+        player.LoseFood(10);
+        Assert.IsTrue(health != player.health);
+    }
+
+    //
+    [Test]
+    public void GameOverWhenPlayerRunsOutOfHealth()
+    {
+        player.PublicStart();
+        player.LoseFood(100);
+        Assert.IsTrue(gameManager.gameOverCalled);
+    }
+
+
 }
